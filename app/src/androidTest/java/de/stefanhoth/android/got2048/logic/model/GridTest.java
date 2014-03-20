@@ -1,8 +1,7 @@
 package de.stefanhoth.android.got2048.logic.model;
 
-import android.test.AndroidTestCase;
-
 import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import java.util.ArrayList;
 
@@ -13,8 +12,15 @@ import java.util.ArrayList;
  *         date: 20.03.14 21:24
  * @since TODO add version
  */
-public class GridTest extends AndroidTestCase {
+public class GridTest extends TestCase {
 
+    public GridTest() {
+        this(GridTest.class.getSimpleName());
+    }
+
+    public GridTest(String name) {
+        super(name);
+    }
 
     public void testGridSetup() {
 
@@ -94,7 +100,27 @@ public class GridTest extends AndroidTestCase {
                 assertFalse(grid.getCell(row, column).hasValue());
             }
         }
+    }
+
+    public void testGetActiveCells() throws Exception {
+
+        Grid grid = new Grid();
+
+        assertTrue(grid.getActiveCells() == 0);
+
+        grid.getCell(0, 0).setValue(1337);
+
+        assertTrue(grid.getActiveCells() == 1);
+
+        grid.getCell(0, 0).setValue(42);
+
+        assertTrue(grid.getActiveCells() == 1);
 
 
+        grid.getCell(1, 1).setValue(31337);
+        assertTrue(grid.getActiveCells() == 2);
+
+        grid.reset();
+        assertTrue(grid.getActiveCells() == 0);
     }
 }

@@ -3,6 +3,7 @@ package de.stefanhoth.android.got2048.logic.model;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * TODO describe class
@@ -17,6 +18,7 @@ public class Grid {
 
     private ArrayList<ArrayList<Cell>> grid;
     private int gridSize;
+    private Random randomGenerator;
 
     public Grid() {
         this(DEFAULT_GRID_SIZE);
@@ -27,14 +29,14 @@ public class Grid {
 
         this.grid = new ArrayList<>(gridSize);
         ArrayList<Cell> row;
-        for (int i = 0; i < gridSize; i++) {
+        for (int rowNumber = 0; rowNumber < gridSize; rowNumber++) {
             row = new ArrayList<>(gridSize);
 
-            for (int j = 0; j < gridSize; j++) {
-                row.add(j, new Cell());
+            for (int columnNumber = 0; columnNumber < gridSize; columnNumber++) {
+                row.add(columnNumber, new Cell(rowNumber, columnNumber));
             }
 
-            this.grid.add(i, row);
+            this.grid.add(rowNumber, row);
         }
         Log.d(TAG, "Grid set up with grid size=" + gridSize);
     }
@@ -64,5 +66,44 @@ public class Grid {
 
     protected ArrayList<ArrayList<Cell>> getGrid() {
         return grid;
+    }
+
+    public int getActiveCells() {
+        int activeCells = 0;
+
+        for (ArrayList<Cell> cells : grid) {
+            for (Cell cell : cells) {
+                if (cell.hasValue()) {
+                    activeCells++;
+                }
+            }
+        }
+
+        return activeCells;
+    }
+
+    public Cell getRandomCell() {
+
+        randomGenerator = new Random();
+        if (randomGenerator == null) {
+            randomGenerator = new Random();
+        }
+
+        return getCell(randomGenerator.nextInt(gridSize), randomGenerator.nextInt(gridSize));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

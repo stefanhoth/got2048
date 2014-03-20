@@ -10,9 +10,19 @@ package de.stefanhoth.android.got2048.logic.model;
 public class Cell {
 
     private Integer value;
+    private int row;
+    private int column;
 
     public Cell() {
         this.value = null;
+        row = -1;
+        column = -1;
+    }
+
+    public Cell(int row, int column) {
+        this.value = null;
+        this.row = row;
+        this.column = column;
     }
 
     public Integer getValue() {
@@ -29,5 +39,43 @@ public class Cell {
 
     public void emptyField(){
         this.value = null;
+    }
+
+    protected int getRow() {
+        return row;
+    }
+
+    protected void setRow(int row) {
+        this.row = row;
+    }
+
+    protected int getColumn() {
+        return column;
+    }
+
+    protected void setColumn(int column) {
+        this.column = column;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Cell cell = (Cell) o;
+
+        if (column != cell.column) return false;
+        if (row != cell.row) return false;
+        if (value != null ? !value.equals(cell.value) : cell.value != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value.hashCode();
+        result = 31 * result + row;
+        result = 31 * result + column;
+        return result;
     }
 }

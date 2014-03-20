@@ -1,7 +1,5 @@
 package de.stefanhoth.android.got2048.logic.model;
 
-import android.test.AndroidTestCase;
-
 import junit.framework.TestCase;
 
 /**
@@ -11,8 +9,15 @@ import junit.framework.TestCase;
  *         date: 20.03.14 20:52
  * @since TODO add version
  */
-public class CellTest extends AndroidTestCase {
+public class CellTest extends TestCase {
 
+    public CellTest() {
+        this(CellTest.class.getSimpleName());
+    }
+
+    public CellTest(String name) {
+        super(name);
+    }
 
     public void testGetValue() throws Exception {
 
@@ -47,5 +52,24 @@ public class CellTest extends AndroidTestCase {
         cell.emptyField();
 
         assertFalse(cell.hasValue());
+    }
+
+    public void testEquals() throws Exception {
+
+        int row = 1;
+        int column = 3;
+        Cell cell1 = new Cell(row, column);
+        Cell cell2 = new Cell();
+        cell2.setRow(row);
+        cell2.setColumn(column);
+
+        assertEquals(cell1, cell2);
+
+        int testValue = 42;
+        cell1.setValue(testValue);
+        assertFalse(cell1.equals(cell2));
+
+        cell2.setValue(testValue);
+        assertTrue(cell1.equals(cell2));
     }
 }
