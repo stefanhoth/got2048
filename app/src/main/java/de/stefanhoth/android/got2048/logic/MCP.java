@@ -2,6 +2,7 @@ package de.stefanhoth.android.got2048.logic;
 
 import de.stefanhoth.android.got2048.logic.model.Cell;
 import de.stefanhoth.android.got2048.logic.model.Grid;
+import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
 
 /**
  * TODO describe class
@@ -13,7 +14,7 @@ import de.stefanhoth.android.got2048.logic.model.Grid;
 public class MCP {
 
     protected static final int DEFAULT_START_FIELDS = 2;
-    private static final int DEFAULT_START_VALUE = 2;
+    protected static final int DEFAULT_START_VALUE = 2;
     private Grid playlingField;
 
     public MCP() {
@@ -33,7 +34,7 @@ public class MCP {
 
         Cell nextCell = playlingField.getRandomCell();
 
-        for (int i = playlingField.getActiveCells(); i < DEFAULT_START_FIELDS; i++) {
+        for (int count = playlingField.getActiveCells(); count < DEFAULT_START_FIELDS; count++) {
             while (cell.equals(nextCell)) {
                 nextCell = playlingField.getRandomCell();
             }
@@ -41,5 +42,12 @@ public class MCP {
             nextCell.setValue(DEFAULT_START_VALUE);
             cell = nextCell;
         }
+    }
+
+    public void move(MOVE_DIRECTION direction) {
+
+        //left to right
+        playlingField.moveCells();
+
     }
 }

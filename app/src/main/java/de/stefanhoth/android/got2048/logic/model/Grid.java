@@ -60,7 +60,7 @@ public class Grid {
         }
     }
 
-    protected int getGridSize() {
+    public int getGridSize() {
         return gridSize;
     }
 
@@ -105,5 +105,52 @@ public class Grid {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    public void moveCells() {
+
+        //FIXME left to right only
+        Cell currentCell, rightNeighborCell;
+        for (int row = 0; row < grid.size(); row++) {
+            for (int column = grid.get(row).size() - 2; column >= 0; column--) { //start at the end of the row but one next to it (last position can't move anymore)
+
+                currentCell = getCell(row, column);
+
+                if (!currentCell.hasValue()) {
+                    //no value, nothing to move nor merge
+                    continue;
+                }
+
+                rightNeighborCell = getCell(row, column + 1);
+
+                while (!rightNeighborCell.hasValue() && rightNeighborCell.getColumn() < grid.get(row).size()) {
+                    rightNeighborCell.setValue(currentCell.getValue());
+                    currentCell.emptyField();
+
+                    if (rightNeighborCell.getColumn() + 1 == grid.get(row).size()) {
+                        break;
+                    }
+
+                    currentCell = rightNeighborCell;
+                    rightNeighborCell = getCell(rightNeighborCell.getRow(), rightNeighborCell.getColumn() + 1);
+                }
+
+                if (canCellsMerge(currentCell, rightNeighborCell)) {
+                    rightNeighborCell.setValue(currentCell.getValue() + rightNeighborCell.getValue());
+                    currentCell.emptyField();
+                }
+                //no movement, no merging = do nothing and move on
+            }
+        }
+
+    }
+
+    private boolean canCellsMerge(Cell currentCell, Cell rightNeighborCell) {
+
+        if (currentCell == null || !currentCell.hasValue() || rightNeighborCell == null || !rightNeighborCell.hasValue()) {
+            return false;
+        }
+
+        return currentCell.getValue().equals(rightNeighborCell.getValue());
     }
 }
