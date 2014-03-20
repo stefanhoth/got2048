@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="score_header_background">#CCDEDEDE</color>
+    <color name="game_background">#CCCCCC</color>
+    <color name="cell_background">#ebe4da</color>
+    <color name="cell_border">#55c6673c</color>
+</resources>

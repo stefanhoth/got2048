@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/grid_row_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_1_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_1_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_1_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_1_4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/grid_row_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/grid_row_1">
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_2_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_2_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_2_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_2_4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/grid_row_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/grid_row_2">
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_3_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_3_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_3_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_3_4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/grid_row_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/grid_row_3">
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_4_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_4_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_4_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+        <de.stefanhoth.android.got2048.widgets.SquareCellView
+            android:id="@+id/grid_cell_4_4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/cell_shape" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

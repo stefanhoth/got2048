@@ -1,4 +1,4 @@
-package de.stefanhoth.android.got2048;
+package de.stefanhoth.android.got2048.fragments;
 
 
 import android.app.Activity;
@@ -21,6 +21,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import de.stefanhoth.android.got2048.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -102,9 +104,10 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
+                        getString(R.string.title_game),
+                        getString(R.string.title_achievements),
+                        getString(R.string.title_about),
+                        getString(R.string.action_settings)
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -247,8 +250,11 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.action_refresh) {
+            Toast.makeText(getActivity(), "How refreshing!", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if(item.getItemId() == R.id.action_random) {
+            Toast.makeText(getActivity(), "How random!", Toast.LENGTH_SHORT).show();
             return true;
         }
 
