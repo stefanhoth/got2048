@@ -12,30 +12,36 @@ import java.util.ArrayList;
  * @since TODO add version
  */
 public class Grid {
-    private static final int GRID_SIZE = 4;
+    protected static final int DEFAULT_GRID_SIZE = 4;
     private static final String TAG = Grid.class.getSimpleName();
 
     private ArrayList<ArrayList<Cell>> grid;
+    private int gridSize;
 
     public Grid() {
+        this(DEFAULT_GRID_SIZE);
+    }
 
-        this.grid = new ArrayList<>(GRID_SIZE);
+    public Grid(int size) {
+        this.gridSize = size;
+
+        this.grid = new ArrayList<>(gridSize);
         ArrayList<Cell> row;
-        for (int i = 0; i < GRID_SIZE; i++) {
-            row = new ArrayList<>(GRID_SIZE);
+        for (int i = 0; i < gridSize; i++) {
+            row = new ArrayList<>(gridSize);
 
-            for (int j = 0; j < GRID_SIZE; j++) {
+            for (int j = 0; j < gridSize; j++) {
                 row.add(j, new Cell());
             }
 
             this.grid.add(i, row);
         }
-        Log.d(TAG, "Grid set up with GRID_SIZE="+GRID_SIZE);
+        Log.d(TAG, "Grid set up with grid size=" + gridSize);
     }
 
     public Cell getCell(int row, int column){
-        if(row >= GRID_SIZE || column >= GRID_SIZE){
-            throw new ArrayIndexOutOfBoundsException("row and column can't exceed GRID_SIZE="+GRID_SIZE+". Values row="+row+", column="+column);
+        if (row >= gridSize || column >= gridSize) {
+            throw new ArrayIndexOutOfBoundsException("row and column can't exceed grid size=" + gridSize + ". Values row=" + row + ", column=" + column);
         }
 
         return grid.get(row).get(column);
@@ -50,5 +56,13 @@ public class Grid {
                 cell.emptyField();
             }
         }
+    }
+
+    protected int getGridSize() {
+        return gridSize;
+    }
+
+    protected ArrayList<ArrayList<Cell>> getGrid() {
+        return grid;
     }
 }
