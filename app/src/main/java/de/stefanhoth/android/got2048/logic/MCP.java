@@ -1,5 +1,6 @@
 package de.stefanhoth.android.got2048.logic;
 
+import de.stefanhoth.android.got2048.logic.model.Cell;
 import de.stefanhoth.android.got2048.logic.model.Grid;
 
 /**
@@ -11,10 +12,34 @@ import de.stefanhoth.android.got2048.logic.model.Grid;
  */
 public class MCP {
 
+    protected static final int DEFAULT_START_FIELDS = 2;
+    private static final int DEFAULT_START_VALUE = 2;
     private Grid playlingField;
 
     public MCP() {
 
         playlingField = new Grid();
+    }
+
+    protected Grid getPlaylingField() {
+        return playlingField;
+    }
+
+    public void addStartCells() {
+
+        Cell cell = playlingField.getRandomCell();
+
+        cell.setValue(DEFAULT_START_VALUE);
+
+        Cell nextCell = playlingField.getRandomCell();
+
+        for (int i = playlingField.getActiveCells(); i < DEFAULT_START_FIELDS; i++) {
+            while (cell.equals(nextCell)) {
+                nextCell = playlingField.getRandomCell();
+            }
+
+            nextCell.setValue(DEFAULT_START_VALUE);
+            cell = nextCell;
+        }
     }
 }

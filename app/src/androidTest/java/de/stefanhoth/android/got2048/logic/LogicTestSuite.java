@@ -21,8 +21,16 @@ public class LogicTestSuite extends TestSuite {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static Test suite() {
 
-        Class[] testClasses = {CellTest.class, GridTest.class};
-        return new TestSuite(testClasses);
+        Class[] testClasses = {
+                CellTest.class,
+                GridTest.class,
+                MCPTest.class
+        };
+
+        TestSuite suite = new TestSuite(testClasses);
+        suite.setName(LogicTestSuite.class.getSimpleName());
+
+        return suite;
     }
 
 }
