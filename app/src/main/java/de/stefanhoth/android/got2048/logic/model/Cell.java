@@ -24,7 +24,7 @@ public class Cell {
     }
 
     public boolean hasValue(){
-        return value == null;
+        return value != null;
     }
 
     public void emptyField(){
