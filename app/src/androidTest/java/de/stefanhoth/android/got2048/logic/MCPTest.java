@@ -50,6 +50,7 @@ public class MCPTest extends TestCase {
 
     public void testMoveRightWorksSingle() throws Exception {
 
+        int gridSize = mcp.getPlaylingField().getGridSize();
         int row = 0;
         int column = 0;
 
@@ -59,19 +60,89 @@ public class MCPTest extends TestCase {
         assertTrue(mcp.getPlaylingField().getCell(row, column).getValue().equals(mcp.DEFAULT_START_VALUE));
 
         Cell cell;
-        for (int testColumn = 1; testColumn < mcp.getPlaylingField().getGridSize(); testColumn++) {
+        for (int testColumn = 1; testColumn < gridSize; testColumn++) {
             cell = mcp.getPlaylingField().getCell(row, testColumn);
+            assertFalse(cell.hasValue());
+        }
+
+        mcp.move(MOVE_DIRECTION.RIGHT);
+
+        for (int testColumn = 0; testColumn < gridSize; testColumn++) {
+
+            cell = mcp.getPlaylingField().getCell(row, testColumn);
+
+            if (testColumn < gridSize - 1) {
+                assertFalse(cell.hasValue());
+            } else {
+                assertTrue(cell.getValue().equals(mcp.DEFAULT_START_VALUE));
+            }
+        }
+    }
+
+    public void testMoveRightWorksSingle_0_1() throws Exception {
+
+        int gridSize = mcp.getPlaylingField().getGridSize();
+        int row = 0;
+        int column = 1;
+
+        mcp.getPlaylingField().reset();
+        mcp.getPlaylingField().getCell(row, column).setValue(mcp.DEFAULT_START_VALUE);
+        assertTrue(mcp.getPlaylingField().getActiveCells() == 1);
+        assertTrue(mcp.getPlaylingField().getCell(row, column).getValue().equals(mcp.DEFAULT_START_VALUE));
+
+        Cell cell;
+        for (int testColumn = 0; testColumn < gridSize; testColumn++) {
+            if (testColumn == column) {
+                continue;
+            }
+            cell = mcp.getPlaylingField().getCell(row, testColumn);
+
             assertFalse(cell.hasValue());
         }
 
         mcp.move(MOVE_DIRECTION.RIGHT);
         assertFalse(mcp.getPlaylingField().getCell(row, column).hasValue());
 
-        for (int testColumn = 1; testColumn < mcp.getPlaylingField().getGridSize(); testColumn++) {
+        for (int testColumn = 0; testColumn < gridSize; testColumn++) {
 
             cell = mcp.getPlaylingField().getCell(row, testColumn);
 
-            if (testColumn < mcp.getPlaylingField().getGridSize() - 1) {
+            if (testColumn < gridSize - 1) {
+                assertFalse(cell.hasValue());
+            } else {
+                assertTrue(cell.getValue().equals(mcp.DEFAULT_START_VALUE));
+            }
+        }
+    }
+
+    public void testMoveRightWorksSingle_0_4() throws Exception {
+
+        int gridSize = mcp.getPlaylingField().getGridSize();
+        int row = 0;
+        int column = gridSize - 1;
+
+        mcp.getPlaylingField().reset();
+        mcp.getPlaylingField().getCell(row, column).setValue(mcp.DEFAULT_START_VALUE);
+        assertTrue(mcp.getPlaylingField().getActiveCells() == 1);
+        assertTrue(mcp.getPlaylingField().getCell(row, column).getValue().equals(mcp.DEFAULT_START_VALUE));
+
+        Cell cell;
+        for (int testColumn = 1; testColumn < gridSize; testColumn++) {
+            if (testColumn == column) {
+                continue;
+            }
+
+            cell = mcp.getPlaylingField().getCell(row, testColumn);
+            assertFalse(cell.hasValue());
+        }
+
+        mcp.move(MOVE_DIRECTION.RIGHT);
+
+        for (int testColumn = 0; testColumn < gridSize; testColumn++) {
+
+            cell = mcp.getPlaylingField().getCell(row, testColumn);
+
+            if (testColumn < gridSize - 1) {
                 assertFalse(cell.hasValue());
             } else {
                 assertTrue(cell.getValue().equals(mcp.DEFAULT_START_VALUE));
