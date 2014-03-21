@@ -18,8 +18,11 @@ public class MCP {
     private Grid playlingField;
 
     public MCP() {
-
         playlingField = new Grid();
+    }
+
+    public MCP(int gridSize) {
+        playlingField = new Grid(gridSize);
     }
 
     protected Grid getPlaylingField() {
