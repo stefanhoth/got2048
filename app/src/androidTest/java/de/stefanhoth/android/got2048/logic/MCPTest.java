@@ -481,6 +481,7 @@ public class MCPTest extends TestCase {
 
         mcp.getPlaylingField().reset();
 
+        //fill the whole row with different values
         for (column = 0; column < gridSize; column++, testValue++) {
             mcp.getPlaylingField().getCell(row, column).setValue(testValue);
             assertTrue(mcp.getPlaylingField().getActiveCells() == column + 1);
