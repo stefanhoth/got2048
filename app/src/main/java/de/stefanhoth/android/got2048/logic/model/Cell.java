@@ -12,6 +12,7 @@ public class Cell {
     private Integer value;
     private int row;
     private int column;
+    private boolean immune;
 
     public Cell() {
         this.value = null;
@@ -77,5 +78,13 @@ public class Cell {
         result = 31 * result + row;
         result = 31 * result + column;
         return result;
+    }
+
+    public boolean isImmune() {
+        return immune;
+    }
+
+    public void setImmune(boolean immune) {
+        this.immune = immune;
     }
 }

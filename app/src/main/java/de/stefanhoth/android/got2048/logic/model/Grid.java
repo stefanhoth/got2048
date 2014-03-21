@@ -138,16 +138,30 @@ public class Grid {
                 if (canCellsMerge(currentCell, rightNeighborCell)) {
                     rightNeighborCell.setValue(currentCell.getValue() + rightNeighborCell.getValue());
                     currentCell.emptyField();
+                    rightNeighborCell.setImmune(true);
                 }
                 //no movement, no merging = do nothing and move on
             }
         }
 
+        //all moves done, reset immunity for all
+        resetCellImmunities();
+    }
+
+    private void resetCellImmunities() {
+        for (ArrayList<Cell> cells : grid) {
+            for (Cell cell : cells) {
+                cell.setImmune(false);
+            }
+        }
     }
 
     private boolean canCellsMerge(Cell currentCell, Cell rightNeighborCell) {
 
-        if (currentCell == null || !currentCell.hasValue() || rightNeighborCell == null || !rightNeighborCell.hasValue()) {
+        if (currentCell == null || !currentCell.hasValue() ||
+                rightNeighborCell == null || !rightNeighborCell.hasValue() ||
+                rightNeighborCell.isImmune()) {
+
             return false;
         }
 
