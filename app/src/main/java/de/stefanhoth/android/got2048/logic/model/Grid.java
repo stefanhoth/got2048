@@ -3,6 +3,7 @@ package de.stefanhoth.android.got2048.logic.model;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -27,7 +28,14 @@ public class Grid {
     public Grid(int size) {
         this.gridSize = size;
 
-        this.grid = new ArrayList<>(gridSize);
+        this.grid = initGrid();
+        Log.d(TAG, "Grid set up with grid size=" + gridSize);
+    }
+
+    private ArrayList<ArrayList<Cell>> initGrid() {
+
+        ArrayList<ArrayList<Cell>> newGrid = new ArrayList<>(gridSize);
+
         ArrayList<Cell> row;
         for (int rowNumber = 0; rowNumber < gridSize; rowNumber++) {
             row = new ArrayList<>(gridSize);
@@ -36,12 +44,13 @@ public class Grid {
                 row.add(columnNumber, new Cell(rowNumber, columnNumber));
             }
 
-            this.grid.add(rowNumber, row);
+            newGrid.add(rowNumber, row);
         }
-        Log.d(TAG, "Grid set up with grid size=" + gridSize);
+
+        return newGrid;
     }
 
-    public Cell getCell(int row, int column){
+    public Cell getCell(int row, int column) {
         if (row >= gridSize || column >= gridSize) {
             throw new ArrayIndexOutOfBoundsException("row and column can't exceed grid size=" + gridSize + ". Values row=" + row + ", column=" + column);
         }
@@ -49,7 +58,7 @@ public class Grid {
         return grid.get(row).get(column);
     }
 
-    public void reset(){
+    public void reset() {
 
         Log.d(TAG, "Resetting grid.");
 
@@ -104,7 +113,26 @@ public class Grid {
 
     @Override
     public String toString() {
-        return super.toString();
+
+        StringBuilder builder = new StringBuilder();
+
+        for (int row = 0; row < grid.size(); row++) {
+            for (int column = 0; column < grid.get(row).size(); column++) {
+
+                builder.append("|");
+
+                if (grid.get(row).get(column).hasValue()) {
+                    builder.append(String.format("%2s", grid.get(row).get(column).getValue()));
+                } else {
+                    builder.append("  ");
+                }
+            }
+            builder
+                    .append("|")
+                    .append("\n");
+        }
+
+        return builder.toString();
     }
 
     public void moveCells() {
@@ -148,6 +176,49 @@ public class Grid {
         resetCellImmunities();
     }
 
+    protected void rotateGrid90(boolean clockwise) {
+
+        transposeGrid();
+        if (clockwise) {
+            reverseEachRow();
+        } else {
+            reverseEachColumn();
+        }
+    }
+
+    protected void transposeGrid() {
+
+        ArrayList<ArrayList<Cell>> transposedGrid = initGrid();
+
+        for (int row = 0; row < grid.size(); row++) {
+            for (int column = 0; column < grid.get(row).size(); column++) {
+                transposedGrid.get(column).set(row, grid.get(row).get(column));
+            }
+        }
+
+        this.grid = transposedGrid;
+    }
+
+    protected void rotateGrid180() {
+        reverseEachRow();
+        reverseEachColumn();
+    }
+
+    protected void reverseEachRow() {
+
+        for (int row = 0; row < grid.size(); row++) {
+            Collections.reverse(grid.get(row));
+        }
+    }
+
+    protected void reverseEachColumn() {
+        rotateGrid90(true);
+        reverseEachRow();
+        rotateGrid90(true);
+        rotateGrid90(true);
+        rotateGrid90(true);
+    }
+
     private void resetCellImmunities() {
         for (ArrayList<Cell> cells : grid) {
             for (Cell cell : cells) {
@@ -167,4 +238,6 @@ public class Grid {
 
         return currentCell.getValue().equals(rightNeighborCell.getValue());
     }
+
+
 }
