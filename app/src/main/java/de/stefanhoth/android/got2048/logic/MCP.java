@@ -49,6 +49,10 @@ public class MCP {
 
     public void move(MOVE_DIRECTION direction) {
 
+        if (!direction.equals(MOVE_DIRECTION.RIGHT)) {
+            throw new UnsupportedOperationException("Only right is implemented so far!");
+        }
+
         //left to right
         playlingField.moveCells();
 
