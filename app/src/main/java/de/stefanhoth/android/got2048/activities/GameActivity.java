@@ -1,22 +1,18 @@
 package de.stefanhoth.android.got2048.activities;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
-import android.app.Fragment;
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment;
+import com.crashlytics.android.Crashlytics;
+
 import de.stefanhoth.android.got2048.R;
+import de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment;
 import de.stefanhoth.android.got2048.fragments.PlayingFieldFragment;
 
 
@@ -36,6 +32,8 @@ public class GameActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Crashlytics.start(this);
+
         setContentView(R.layout.activity_game);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
