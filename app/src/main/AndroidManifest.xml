@@ -20,7 +20,7 @@
         </activity>
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="@string/CRASHALYTICS_API_KEY" />
+            android:value="@string/CRASHLYTICS_API_KEY" />
     </application>
 
 </manifest>
