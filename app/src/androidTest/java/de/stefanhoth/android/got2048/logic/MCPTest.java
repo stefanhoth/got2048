@@ -480,4 +480,107 @@ public class MCPTest extends TestCase {
         assertEquals("Cell [0|0]", testValue1, mcp.getPlaylingField().getCellValue(0, 0));
         assertEquals("Cell [0|2]", testValue2 + testValue3, mcp.getPlaylingField().getCellValue(0, 2));
     }
+
+    public void testMoveUp3CellsNoMerge() throws Exception {
+
+        int testValue1 = 1337;
+        int testValue2 = 42;
+        int testValue3 = 43;
+
+        mcp.getPlaylingField().reset();
+
+        mcp.getPlaylingField().setCellValue(3, 0, testValue1);
+        mcp.getPlaylingField().setCellValue(1, 2, testValue2);
+        mcp.getPlaylingField().setCellValue(3, 2, testValue3);
+
+        assertEquals("Active cells before move", 3, mcp.getPlaylingField().getActiveCells());
+
+        mcp.move(MOVE_DIRECTION.UP);
+
+        assertEquals("Active cells after move", 3, mcp.getPlaylingField().getActiveCells());
+
+        assertEquals("Cell [0|0]", testValue1, mcp.getPlaylingField().getCellValue(0, 0));
+        assertEquals("Cell [0|2]", testValue2, mcp.getPlaylingField().getCellValue(0, 2));
+        assertEquals("Cell [1|2]", testValue3, mcp.getPlaylingField().getCellValue(1, 2));
+    }
+
+    public void testMoveDown5Cells1Merge() throws Exception {
+
+        int testValue1 = 1337;
+        int testValue2 = 42;
+        int testValue3 = 42;
+        int testValue4 = 1234;
+        int testValue5 = 589;
+
+        mcp.getPlaylingField().reset();
+
+        mcp.getPlaylingField().setCellValue(0, 0, testValue1);
+        mcp.getPlaylingField().setCellValue(1, 0, testValue2);
+        mcp.getPlaylingField().setCellValue(2, 0, testValue3);
+        mcp.getPlaylingField().setCellValue(3, 0, testValue4);
+
+        mcp.getPlaylingField().setCellValue(1, 2, testValue5);
+
+        assertEquals("Active cells before move", 5, mcp.getPlaylingField().getActiveCells());
+
+        mcp.move(MOVE_DIRECTION.DOWN);
+
+        assertEquals("Active cells after move", 4, mcp.getPlaylingField().getActiveCells());
+
+        assertEquals("Cell [3|0]", testValue4, mcp.getPlaylingField().getCellValue(3, 0));
+        assertEquals("Cell [2|0]", testValue2 + testValue3, mcp.getPlaylingField().getCellValue(2, 0));
+        assertEquals("Cell [1|0]", testValue1, mcp.getPlaylingField().getCellValue(1, 0));
+        assertEquals("Cell [1|0]", testValue5, mcp.getPlaylingField().getCellValue(3, 2));
+    }
+
+    public void testMoveLeft5Cells2Merge() throws Exception {
+
+        int testValue1 = 1337;
+        int testValue2 = 1337;
+        int testValue3 = 42;
+        int testValue4 = 42;
+        int testValue5 = 589;
+
+        mcp.getPlaylingField().reset();
+
+        mcp.getPlaylingField().setCellValue(0, 1, testValue1);
+        mcp.getPlaylingField().setCellValue(0, 3, testValue2);
+        mcp.getPlaylingField().setCellValue(2, 0, testValue3);
+        mcp.getPlaylingField().setCellValue(2, 3, testValue4);
+        mcp.getPlaylingField().setCellValue(3, 2, testValue5);
+
+        assertEquals("Active cells before move", 5, mcp.getPlaylingField().getActiveCells());
+
+        mcp.move(MOVE_DIRECTION.LEFT);
+
+        assertEquals("Active cells after move", 3, mcp.getPlaylingField().getActiveCells());
+
+        assertEquals("Cell [0|0]", testValue1 + testValue2, mcp.getPlaylingField().getCellValue(0, 0));
+        assertEquals("Cell [2|0]", testValue3 + testValue4, mcp.getPlaylingField().getCellValue(2, 0));
+        assertEquals("Cell [3|0]", testValue5, mcp.getPlaylingField().getCellValue(3, 0));
+    }
+
+    public void testMoveLeft4Cells2MergeInSameRow() throws Exception {
+
+        int testValue1 = 1337;
+        int testValue2 = 1337;
+        int testValue3 = 42;
+        int testValue4 = 42;
+
+        mcp.getPlaylingField().reset();
+
+        mcp.getPlaylingField().setCellValue(0, 0, testValue1);
+        mcp.getPlaylingField().setCellValue(0, 1, testValue2);
+        mcp.getPlaylingField().setCellValue(0, 2, testValue3);
+        mcp.getPlaylingField().setCellValue(0, 3, testValue4);
+
+        assertEquals("Active cells before move", 4, mcp.getPlaylingField().getActiveCells());
+
+        mcp.move(MOVE_DIRECTION.LEFT);
+
+        assertEquals("Active cells after move", 2, mcp.getPlaylingField().getActiveCells());
+
+        assertEquals("Cell [0|0]", testValue1 + testValue2, mcp.getPlaylingField().getCellValue(0, 0));
+        assertEquals("Cell [0|1]", testValue3 + testValue4, mcp.getPlaylingField().getCellValue(0, 1));
+    }
 }
