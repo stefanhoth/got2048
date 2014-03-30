@@ -1,11 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="de.stefanhoth.android.got2048.GameActivity" >
-    <item android:id="@+id/action_example"
-        android:title="@string/action_example"
+    tools:context="de.stefanhoth.android.got2048.activities.GameActivity" >
+    <item android:id="@+id/action_random"
+        android:title="@string/action_random"
+        android:icon="@drawable/ic_action_view_as_grid"
         android:showAsAction="withText|ifRoom" />
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
+    <item android:id="@+id/action_refresh"
+        android:title="@string/action_restart"
+        android:icon="@drawable/ic_action_refresh"
+        android:showAsAction="withText|ifRoom" />
 </menu>

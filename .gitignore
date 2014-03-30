@@ -4,3 +4,5 @@
 *.iml
 .DS_Store
 
+secrets.xml
+com_crashlytics_export_strings.xml
