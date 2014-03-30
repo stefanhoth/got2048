@@ -2,6 +2,7 @@ package de.stefanhoth.android.got2048.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.widget.TextView;
 
 import de.stefanhoth.android.got2048.R;
@@ -19,14 +20,21 @@ public class SquareCellView extends TextView {
 
     public SquareCellView(Context context) {
         super(context);
+        init();
     }
 
     public SquareCellView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public SquareCellView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init();
+    }
+
+    private void init() {
+        this.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.cell_font_size));
     }
 
     @Override

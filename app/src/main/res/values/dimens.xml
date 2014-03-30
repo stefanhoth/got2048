@@ -8,4 +8,6 @@
     <dimen name="navigation_drawer_width">240dp</dimen>
     <dimen name="score_header_padding">10dp</dimen>
     <dimen name="score_header_height">60dp</dimen>
+    
+    <dimen name="cell_font_size">30sp</dimen>
 </resources>
