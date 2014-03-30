@@ -2,7 +2,7 @@ package de.stefanhoth.android.got2048.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * TODO describe class
@@ -11,7 +11,8 @@ import android.widget.LinearLayout;
  *         date: 20.03.14 20:00
  * @since TODO add version
  */
-public class SquareCellView extends LinearLayout {
+public class SquareCellView extends TextView {
+
     public SquareCellView(Context context) {
         super(context);
     }
@@ -26,6 +27,7 @@ public class SquareCellView extends LinearLayout {
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
     }
 }

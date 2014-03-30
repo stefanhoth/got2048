@@ -2,63 +2,67 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.stefanhoth.android.got2048.fragments.PlayingFieldFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="de.stefanhoth.android.got2048.fragments.PlayingFieldFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/score_header_height"
+        android:background="@color/score_header_background"
         android:orientation="horizontal"
-        android:padding="@dimen/score_header_padding"
-        android:background="@color/score_header_background">
+        android:padding="@dimen/score_header_padding">
+
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/label_score_current"
+            android:layout_weight="1"
+            android:gravity="center|end"
             android:maxLines="2"
-            android:gravity="center|end"/>
+            android:text="@string/label_score_current" />
 
         <TextView
             android:id="@+id/txt_score_current"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:singleLine="true"
+            android:layout_weight="1"
             android:gravity="center"
+            android:singleLine="true"
             android:text="42"
             android:textColor="@android:color/holo_blue_dark"
             android:textSize="20sp" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/label_score_best"
+            android:layout_weight="1"
+            android:gravity="center|end"
             android:maxLines="2"
-            android:gravity="center|end"/>
+            android:text="@string/label_score_best" />
 
         <TextView
             android:id="@+id/txt_score_best"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:singleLine="true"
+            android:layout_weight="1"
             android:gravity="center"
+            android:singleLine="true"
             android:text="1338"
             android:textColor="@android:color/holo_blue_dark"
             android:textSize="20sp" />
 
     </LinearLayout>
-    <LinearLayout
+
+    <de.stefanhoth.android.got2048.widgets.SquareGridView xmlns:squaregrid="http://schemas.android.com/apk/res-auto"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/game_background">
+        android:layout_gravity="center_horizontal"
+        android:background="@color/game_background"
+        android:stretchMode="columnWidth"
+        android:horizontalSpacing="2dp"
+        android:verticalSpacing="2dp"
+        android:padding="10dp"
 
-        <include layout="@layout/include_play_grid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        </LinearLayout>
+        squaregrid:gridsize="4" />
 
 </LinearLayout>
