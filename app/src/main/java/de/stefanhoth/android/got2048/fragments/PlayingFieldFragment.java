@@ -3,7 +3,9 @@ package de.stefanhoth.android.got2048.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -13,6 +15,7 @@ import butterknife.InjectView;
 import de.stefanhoth.android.got2048.Got2048App;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.logic.MCP;
+import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
 import de.stefanhoth.android.got2048.widgets.SquareGridView;
 
 /**
@@ -26,7 +29,6 @@ import de.stefanhoth.android.got2048.widgets.SquareGridView;
  */
 public class PlayingFieldFragment extends Fragment implements MCP.GridUpdateListener {
 
-
     private static final String KEY_LAST_HIGHSCORE = "KEY_LAST_HIGHSCORE";
 
     private int mCurrentScore;
@@ -38,7 +40,9 @@ public class PlayingFieldFragment extends Fragment implements MCP.GridUpdateList
     @InjectView(R.id.game_status)
     TextView mGameStatus;
 
-    private OnPlayingFieldEventListener mListener;
+    private OnPlayingFieldEventListener mPlayingFieldEventListener;
+    private GestureDetector mGestureDetector;
+    private View.OnTouchListener mGestureListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -76,21 +80,38 @@ public class PlayingFieldFragment extends Fragment implements MCP.GridUpdateList
             ((Got2048App) getActivity().getApplication()).getMCP().addGridUpdateListeners(this);
         }
 
-        return view;
-    }
+        // Gesture detection
+        mGestureDetector = new GestureDetector(container.getContext(), new MyGestureDetector());
+        mGestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onGameWon(int score) {
-        if (mListener != null) {
-            mListener.onFragmentWonMessage(score);
-        }
+                if (mGestureDetector.onTouchEvent(event)) {
+                    return true;
+                }
+
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+
+//                    if (mIsScrolling) {
+//                        mIsScrolling = false;
+//                        handleScrollFinished();
+//                        return true;
+//                    }
+                }
+
+                return false;
+            }
+        };
+
+        mSquareGridView.setOnTouchListener(mGestureListener);
+
+        return view;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnPlayingFieldEventListener) activity;
+            mPlayingFieldEventListener = (OnPlayingFieldEventListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnPlayingFieldEventListener");
@@ -100,7 +121,7 @@ public class PlayingFieldFragment extends Fragment implements MCP.GridUpdateList
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mPlayingFieldEventListener = null;
     }
 
     @Override
@@ -134,7 +155,70 @@ public class PlayingFieldFragment extends Fragment implements MCP.GridUpdateList
      * activity.
      */
     public interface OnPlayingFieldEventListener {
-        public void onFragmentWonMessage(int score);
+        public void onMovementRecognized(MOVE_DIRECTION direction);
     }
 
+    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+
+        private static final int SWIPE_MIN_DISTANCE = 80;
+        private static final int SWIPE_MAX_OFF_PATH = 100;
+        private static final int SWIPE_THRESHOLD_VELOCITY = 150;
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+//        if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH) {
+//            return false;
+//        }
+
+            String direction = "";
+            if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                //move up
+                announceMovement(MOVE_DIRECTION.UP);
+            } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                //move down
+                announceMovement(MOVE_DIRECTION.DOWN);
+            } else if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                //move left
+                announceMovement(MOVE_DIRECTION.LEFT);
+            } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                //move right
+                announceMovement(MOVE_DIRECTION.RIGHT);
+            }
+
+            return true;
+        }
+
+    }
+
+    private void announceMovement(MOVE_DIRECTION direction) {
+
+        if (mPlayingFieldEventListener != null) {
+            mPlayingFieldEventListener.onMovementRecognized(direction);
+        }
+    }
 }

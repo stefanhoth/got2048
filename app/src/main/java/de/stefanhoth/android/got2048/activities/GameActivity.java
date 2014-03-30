@@ -5,20 +5,23 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 
+import de.stefanhoth.android.got2048.Got2048App;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment;
 import de.stefanhoth.android.got2048.fragments.PlayingFieldFragment;
+import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
 
 
 public class GameActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, PlayingFieldFragment.OnPlayingFieldEventListener {
 
+    private static final String TAG = GameActivity.class.getName();
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -107,7 +110,19 @@ public class GameActivity extends Activity
     }
 
     @Override
-    public void onFragmentWonMessage(int score) {
-        Toast.makeText(getBaseContext(), "Congrats to win the game with "+score+" points!", Toast.LENGTH_SHORT).show();
+    public void onMovementRecognized(MOVE_DIRECTION direction) {
+
+        if (direction == null) {
+            Log.e(TAG, "onMovementRecognized: direction = null");
+            return;
+        }
+
+        if (getApplication() == null || !(getApplication() instanceof Got2048App)) {
+            Log.e(TAG, "onMovementRecognized: Can't access application object");
+            return;
+        }
+
+        Log.d(TAG, "onMovementRecognized: Received swipe to " + direction);
+        ((Got2048App) getApplication()).getMCP().move(direction);
     }
 }
