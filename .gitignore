@@ -1,6 +1,8 @@
 .gradle
 /local.properties
-.idea/*.*
+.idea/**
 *.iml
 .DS_Store
 
+secrets.xml
+com_crashlytics_export_strings.xml
