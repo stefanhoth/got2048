@@ -23,8 +23,8 @@ import de.stefanhoth.android.got2048.R;
  */
 public class SquareGridView extends GridView {
 
-    private static final int DEFAULT_GRID_SIZE = 4;
     private static final String TAG = SquareGridView.class.getName();
+    private static final int DEFAULT_GRID_SIZE = 4;
 
     private int mGridSize = -1;
 
