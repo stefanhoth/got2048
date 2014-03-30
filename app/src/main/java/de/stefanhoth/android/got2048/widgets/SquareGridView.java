@@ -85,7 +85,7 @@ public class SquareGridView extends GridView {
                 cell = new SquareCellView(context);
                 cell.setId(generateViewId());
 
-                cell.setBackgroundColor(getResources().getColor(R.color.cell_background));
+                cell.setBackgroundColor(getResources().getColor(R.color.cell_background_default));
                 cell.setGravity(Gravity.CENTER);
                 cells[row][column] = cell;
             }
@@ -106,10 +106,12 @@ public class SquareGridView extends GridView {
                     continue;
                 }
 
-                //TODO filter invalid values
-                cells[row][column].setText(String.valueOf(values[row][column]));
+                Log.d(TAG, "updateGrid: New value for cell[" + row + "," + column + "]=" + values[row][column]);
+                cells[row][column].setValue(values[row][column]);
             }
         }
+        invalidate();
+        requestLayout();
     }
 
     @Override

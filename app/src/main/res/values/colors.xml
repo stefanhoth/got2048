@@ -2,6 +2,16 @@
 <resources>
     <color name="score_header_background">#CCDEDEDE</color>
     <color name="game_background">#CCCCCC</color>
-    <color name="cell_background">#ebe4da</color>
-    <color name="cell_border">#55c6673c</color>
+    <color name="cell_background_default">#ebe4da</color>
+    <color name="cell_background_step_1">#ff33B5E5</color>
+    <color name="cell_background_step_2">#ff0099CC</color>
+    <color name="cell_background_step_3">#ffAA66CC</color>
+    <color name="cell_background_step_4">#ff9933CC</color>
+    <color name="cell_background_step_5">#ff99CC00</color>
+    <color name="cell_background_step_6">#ff669900</color>
+    <color name="cell_background_step_7">#ffFFBB33</color>
+    <color name="cell_background_step_8">#ffFF8800</color>
+    <color name="cell_background_step_9">#ffFF4444</color>
+    <color name="cell_background_step_10">#ffCC0000</color>
+    <color name="cell_background_step_11">#fffff500</color>
 </resources>
