@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.stefanhoth.android.got2048.R;
@@ -78,36 +77,16 @@ public class SquareGridView extends GridView {
         cells = new SquareCellView[mGridSize][mGridSize];
         this.setNumColumns(mGridSize);
 
-        int[][] viewIds = new int[mGridSize][mGridSize];
-
-        int[] colors = {
-                android.R.color.holo_blue_light,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light,
-                android.R.color.white,
-                android.R.color.holo_purple,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_blue_dark,
-                android.R.color.holo_red_dark,
-                android.R.color.holo_orange_dark
-        };
-        Random random = new Random();
-
         SquareCellView cell;
 
         for (int row = 0; row < mGridSize; row++) {
             for (int column = 0; column < mGridSize; column++) {
 
                 cell = new SquareCellView(context);
-                viewIds[row][column] = generateViewId();
-                cell.setId(viewIds[row][column]);
+                cell.setId(generateViewId());
 
-                cell.setText("[" + row + "," + column + "]");
+                cell.setBackgroundColor(getResources().getColor(R.color.cell_background));
                 cell.setGravity(Gravity.CENTER);
-
-                cell.setBackgroundColor(getResources().getColor(colors[random.nextInt(colors.length)]));
-
                 cells[row][column] = cell;
             }
         }
