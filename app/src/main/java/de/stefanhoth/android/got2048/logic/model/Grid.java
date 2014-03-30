@@ -2,8 +2,7 @@ package de.stefanhoth.android.got2048.logic.model;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -14,12 +13,14 @@ import java.util.Random;
  * @since TODO add version
  */
 public class Grid {
-    protected static final int DEFAULT_GRID_SIZE = 4;
     private static final String TAG = Grid.class.getSimpleName();
+    protected static final int DEFAULT_GRID_SIZE = 4;
+    protected static final int DEFAULT_EMPTY_VALUE = -1;
 
-    private ArrayList<ArrayList<Cell>> grid;
+    private int[][] grid;
     private int gridSize;
     private Random randomGenerator;
+    private HashSet<String> cellImmunities;
 
     public Grid() {
         this(DEFAULT_GRID_SIZE);
@@ -27,44 +28,74 @@ public class Grid {
 
     public Grid(int size) {
         this.gridSize = size;
+        cellImmunities = new HashSet<>();
 
         this.grid = initGrid();
         Log.d(TAG, "Grid set up with grid size=" + gridSize);
     }
 
-    private ArrayList<ArrayList<Cell>> initGrid() {
+    private int[][] initGrid() {
 
-        ArrayList<ArrayList<Cell>> newGrid = new ArrayList<>(gridSize);
+        int[][] newGrid = new int[gridSize][gridSize];
 
-        ArrayList<Cell> row;
         for (int rowNumber = 0; rowNumber < gridSize; rowNumber++) {
-            row = new ArrayList<>(gridSize);
-
             for (int columnNumber = 0; columnNumber < gridSize; columnNumber++) {
-                row.add(columnNumber, new Cell(rowNumber, columnNumber));
+                newGrid[rowNumber][columnNumber] = DEFAULT_EMPTY_VALUE;
             }
-
-            newGrid.add(rowNumber, row);
         }
 
         return newGrid;
     }
 
-    public Cell getCell(int row, int column) {
+    public int getCellValue(int row, int column) {
         if (row >= gridSize || column >= gridSize) {
             throw new ArrayIndexOutOfBoundsException("row and column can't exceed grid size=" + gridSize + ". Values row=" + row + ", column=" + column);
         }
 
-        return grid.get(row).get(column);
+        return grid[row][column];
+    }
+
+    public int[] getRow(int row) {
+        if (row >= gridSize) {
+            throw new ArrayIndexOutOfBoundsException("row can't exceed grid size=" + gridSize + ". Value row=" + row);
+        }
+
+        return grid[row];
+    }
+
+    public int[] getColumn(int column) {
+        if (column >= gridSize) {
+            throw new ArrayIndexOutOfBoundsException("column can't exceed grid size=" + gridSize + ". Value column=" + column);
+        }
+
+        int[] columnValues = new int[gridSize];
+
+        for (int row = 0; row < gridSize; row++) {
+            columnValues[row] = getCellValue(row, column);
+        }
+
+        return columnValues;
+    }
+
+    public void setCellValue(int row, int column, int value) {
+        if (row >= gridSize || column >= gridSize) {
+            throw new ArrayIndexOutOfBoundsException("row and column can't exceed grid size=" + gridSize + ". Values row=" + row + ", column=" + column);
+        }
+
+        grid[row][column] = value;
+    }
+
+    public void resetCell(int row, int column) {
+        setCellValue(row, column, DEFAULT_EMPTY_VALUE);
     }
 
     public void reset() {
 
         Log.d(TAG, "Resetting grid.");
 
-        for (ArrayList<Cell> cells : grid) {
-            for (Cell cell : cells) {
-                cell.emptyField();
+        for (int row = 0; row < grid.length; row++) {
+            for (int column = 0; column < grid[row].length; column++) {
+                grid[row][column] = DEFAULT_EMPTY_VALUE;
             }
         }
     }
@@ -73,16 +104,16 @@ public class Grid {
         return gridSize;
     }
 
-    protected ArrayList<ArrayList<Cell>> getGrid() {
+    protected int[][] getGrid() {
         return grid;
     }
 
     public int getActiveCells() {
         int activeCells = 0;
 
-        for (ArrayList<Cell> cells : grid) {
-            for (Cell cell : cells) {
-                if (cell.hasValue()) {
+        for (int[] cells : grid) {
+            for (int cellValue : cells) {
+                if (cellValue > DEFAULT_EMPTY_VALUE) {
                     activeCells++;
                 }
             }
@@ -98,7 +129,7 @@ public class Grid {
             randomGenerator = new Random();
         }
 
-        return getCell(randomGenerator.nextInt(gridSize), randomGenerator.nextInt(gridSize));
+        return new Cell(randomGenerator.nextInt(gridSize), randomGenerator.nextInt(gridSize));
     }
 
     @Override
@@ -116,13 +147,13 @@ public class Grid {
 
         StringBuilder builder = new StringBuilder();
 
-        for (int row = 0; row < grid.size(); row++) {
-            for (int column = 0; column < grid.get(row).size(); column++) {
+        for (int row = 0; row < grid.length; row++) {
+            for (int column = 0; column < grid[row].length; column++) {
 
                 builder.append("|");
 
-                if (grid.get(row).get(column).hasValue()) {
-                    builder.append(String.format("%2s", grid.get(row).get(column).getValue()));
+                if (grid[row].length > DEFAULT_EMPTY_VALUE) {
+                    builder.append(String.format("%2s", grid[row][column]));
                 } else {
                     builder.append("  ");
                 }
@@ -135,45 +166,105 @@ public class Grid {
         return builder.toString();
     }
 
-    public void moveCells() {
+    public void moveCells(MOVE_DIRECTION direction) {
 
-        //FIXME left to right only
-        Cell currentCell, rightNeighborCell;
-        for (int row = 0; row < grid.size(); row++) {
-            for (int column = grid.get(row).size() - 2; column >= 0; column--) { //start at the end of the row but one next to it (last position can't move anymore)
+        // taking the easy route: always make the move from
+        // left to right by turning the grid in this direction
+        switch (direction) {
+            case UP:
+                Log.d(TAG, "moveCells: direction=" + direction + ", rotating grid by 90° clockwise");
+                rotateGrid90(true);
+                break;
+            case DOWN:
+                Log.d(TAG, "moveCells: direction=" + direction + ", rotating grid by 90° counter-clockwise");
+                rotateGrid90(false);
+                break;
+            case LEFT:
+                Log.d(TAG, "moveCells: direction=" + direction + ", rotating grid by 180°");
+                rotateGrid180();
+                break;
+            case RIGHT:
+                // nothing necessary
+                break;
+        }
 
-                currentCell = getCell(row, column);
+        Log.d(TAG, "moveCells: Direction adjustment done.");
 
-                if (!currentCell.hasValue()) {
+        int currentCellValue, currentColumn, rightNeighborColumn;
+        for (int row = 0; row < grid.length; row++) {
+            for (int column = grid[row].length - 2; column >= 0; column--) { //start at the end of the row but one next to it (last position can't move anymore)
+
+                currentCellValue = getCellValue(row, column);
+
+                Log.d(TAG, "moveCells: Direction adjustment done.");
+                if (currentCellValue == DEFAULT_EMPTY_VALUE) {
                     //no value, nothing to move nor merge
+                    Log.v(TAG, "moveCells: Cell [" + row + "," + column + "] is empty, nothing to move.");
+                    continue;
+                } else if (column + 1 == grid[row].length) {
+                    Log.v(TAG, "moveCells: Cell [" + row + "," + column + "] is already the righter most column, nothing to move.");
                     continue;
                 }
 
-                rightNeighborCell = getCell(row, column + 1);
+                currentColumn = column;
+                rightNeighborColumn = column + 1;
 
-                while (!rightNeighborCell.hasValue() && rightNeighborCell.getColumn() < grid.get(row).size()) {
-                    rightNeighborCell.setValue(currentCell.getValue());
-                    currentCell.emptyField();
+                //move the cell as far to the right (along the row) as possible
+                while (rightNeighborColumn < grid[row].length && !cellHasValue(row, rightNeighborColumn)) {
 
-                    if (rightNeighborCell.getColumn() + 1 == grid.get(row).size()) {
+                    Log.v(TAG, "moveCells: Moving cell [" + row + "," + currentColumn + "] with value=" + currentCellValue + " to cell [" + row + "," + rightNeighborColumn + "]");
+                    setCellValue(row, rightNeighborColumn, currentCellValue);
+                    Log.v(TAG, "moveCells: Clearing value of cell [" + row + "," + column + "]");
+                    resetCell(row, currentColumn);
+
+                    if (rightNeighborColumn + 1 == getRow(row).length) {
+                        Log.v(TAG, "moveCells: Row is completely moved, cell [" + row + "," + rightNeighborColumn + "] was last.");
                         break;
                     }
 
-                    currentCell = rightNeighborCell;
-                    rightNeighborCell = getCell(rightNeighborCell.getRow(), rightNeighborCell.getColumn() + 1);
+                    currentColumn++;
+                    rightNeighborColumn++;
                 }
 
-                if (canCellsMerge(currentCell, rightNeighborCell)) {
-                    rightNeighborCell.setValue(currentCell.getValue() + rightNeighborCell.getValue());
-                    currentCell.emptyField();
-                    rightNeighborCell.setImmune(true);
+                if (canCellsMerge(row, currentColumn, row, rightNeighborColumn)) {
+                    Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can and will be merged");
+                    setCellValue(row, rightNeighborColumn, getCellValue(row, currentColumn) + getCellValue(row, rightNeighborColumn));
+                    resetCell(row, currentColumn);
+                    setCellImmune(row, rightNeighborColumn);
+                } else {
+                    Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can't be merged");
                 }
+
+                Log.v(TAG, "moveCells: Movement and merging for row=" + row + " done.");
                 //no movement, no merging = do nothing and move on
             }
         }
 
+        Log.v(TAG, "moveCells: Movement done.");
+
         //all moves done, reset immunity for all
         resetCellImmunities();
+
+        //don't forget to turn them back
+        switch (direction) {
+            case UP:
+                Log.d(TAG, "moveCells: direction=" + direction + ", rotating grid back by 90° counter-clockwise");
+                rotateGrid90(false);
+                break;
+            case DOWN:
+                Log.d(TAG, "moveCells: direction=" + direction + ", rotating grid back by 90° clockwise");
+                rotateGrid90(true);
+                break;
+            case LEFT:
+                Log.d(TAG, "moveCells: direction=" + direction + ", rotating grid back by 180°");
+                rotateGrid180();
+                break;
+            case RIGHT:
+                // nothing necessary
+                break;
+        }
+
+        Log.d(TAG, "moveCells: Direction adjustment reverted.");
     }
 
     protected void rotateGrid90(boolean clockwise) {
@@ -188,11 +279,12 @@ public class Grid {
 
     protected void transposeGrid() {
 
-        ArrayList<ArrayList<Cell>> transposedGrid = initGrid();
+        int[][] transposedGrid = initGrid();
 
-        for (int row = 0; row < grid.size(); row++) {
-            for (int column = 0; column < grid.get(row).size(); column++) {
-                transposedGrid.get(column).set(row, grid.get(row).get(column));
+        for (int row = 0; row < grid.length; row++) {
+            for (int column = 0; column < getRow(row).length; column++) {
+                Log.v(TAG, "transposeGrid: Assigning cell [" + column + "," + row + "] = cell[" + row + "," + column + "]");
+                transposedGrid[column][row] = getCellValue(row, column);
             }
         }
 
@@ -206,38 +298,77 @@ public class Grid {
 
     protected void reverseEachRow() {
 
-        for (int row = 0; row < grid.size(); row++) {
-            Collections.reverse(grid.get(row));
-        }
-    }
+        for (int row = 0; row < grid.length; row++) {
 
-    protected void reverseEachColumn() {
-        rotateGrid90(true);
-        reverseEachRow();
-        rotateGrid90(true);
-        rotateGrid90(true);
-        rotateGrid90(true);
-    }
+            Log.v(TAG, "reverseEachRow: Reversing row=" + row);
 
-    private void resetCellImmunities() {
-        for (ArrayList<Cell> cells : grid) {
-            for (Cell cell : cells) {
-                cell.setImmune(false);
+            //solution from http://stackoverflow.com/a/3523066/409349
+            int left = 0;
+            int right = grid[row].length - 1;
+
+            while (left < right) {
+                // swap the values at the left and right indices
+                int temp = grid[row][left];
+                grid[row][left] = grid[row][right];
+                grid[row][right] = temp;
+
+                // move the left and right index pointers in toward the center
+                left++;
+                right--;
             }
         }
     }
 
-    private boolean canCellsMerge(Cell currentCell, Cell rightNeighborCell) {
+    protected void reverseEachColumn() {
 
-        if (currentCell == null || !currentCell.hasValue() ||
-                rightNeighborCell == null || !rightNeighborCell.hasValue() ||
-                rightNeighborCell.isImmune()) {
+        for (int column = 0; column < grid[0].length; column++) {
+
+            Log.v(TAG, "reverseEachColumn: Reversing column=" + column);
+
+            //solution from http://stackoverflow.com/a/3523066/409349
+            int up = 0;
+            int down = grid[0].length - 1;
+
+            while (up < down) {
+                // swap the values at the up and down indices
+                int temp = grid[up][column];
+                grid[up][column] = grid[down][column];
+                grid[down][column] = temp;
+
+                // move the up and down index pointers in toward the center
+                up++;
+                down--;
+            }
+        }
+    }
+
+    private void resetCellImmunities() {
+
+        cellImmunities.clear();
+    }
+
+    private boolean canCellsMerge(int currentCellRow, int currentCellColumn, int rightNeighborCellRow, int rightNeighborCellColumn) {
+
+        if (getCellValue(currentCellRow, currentCellColumn) == DEFAULT_EMPTY_VALUE ||
+                getCellValue(rightNeighborCellRow, rightNeighborCellColumn) == DEFAULT_EMPTY_VALUE ||
+                isCellImmune(rightNeighborCellRow, rightNeighborCellColumn)
+                ) {
 
             return false;
         }
 
-        return currentCell.getValue().equals(rightNeighborCell.getValue());
+        return getCellValue(currentCellRow, currentCellColumn) == getCellValue(rightNeighborCellRow, rightNeighborCellColumn);
     }
 
+    private void setCellImmune(int row, int column) {
+        cellImmunities.add(row + "-" + column);
+    }
 
+    private boolean isCellImmune(int row, int column) {
+        return cellImmunities.contains(row + "-" + column);
+    }
+
+    public boolean cellHasValue(int row, int column) {
+        return getCellValue(row, column) > DEFAULT_EMPTY_VALUE;
+    }
 }

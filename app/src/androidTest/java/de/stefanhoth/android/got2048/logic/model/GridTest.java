@@ -3,8 +3,6 @@ package de.stefanhoth.android.got2048.logic.model;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
-
 /**
  * TODO describe class
  *
@@ -25,25 +23,27 @@ public class GridTest extends TestCase {
     public void testGridSetup() {
 
         Grid grid = new Grid();
-        assertNotNull(grid);
-        assertEquals(grid.getGridSize(), Grid.DEFAULT_GRID_SIZE);
-        assertNotNull(grid.getGrid());
-        assertEquals(grid.getGrid().size(), Grid.DEFAULT_GRID_SIZE);
+        assertNotNull("Grid is not null", grid);
+        assertEquals("Gridsize is DEFAULT_GRID_SIZE", Grid.DEFAULT_GRID_SIZE, grid.getGridSize());
+        assertNotNull("Grid.getGrid not null", grid.getGrid());
+        assertEquals("Actual grid is DEFAULT_GRID_SIZE", Grid.DEFAULT_GRID_SIZE, grid.getGrid().length);
 
-        for (ArrayList<Cell> cells : grid.getGrid()) {
-            assertEquals(cells.size(), Grid.DEFAULT_GRID_SIZE);
+
+        for (int rowNumber = 0; rowNumber < grid.getGridSize(); rowNumber++) {
+            assertEquals("Row=" + rowNumber + " is DEFAULT_GRID_SIZE ", Grid.DEFAULT_GRID_SIZE, grid.getRow(rowNumber).length);
         }
 
-        int testSize = 5;
-        grid = new Grid(5);
+        int testSize = 8;
+        grid = new Grid(testSize);
 
-        assertNotNull(grid);
-        assertEquals(grid.getGridSize(), testSize);
-        assertNotNull(grid.getGrid());
+        assertNotNull("Grid is not null", grid);
+        assertEquals("Gridsize is DEFAULT_GRID_SIZE", testSize, grid.getGridSize());
+        assertNotNull("Grid.getGrid not null", grid.getGrid());
+        assertEquals("Actual grid is DEFAULT_GRID_SIZE", testSize, grid.getGrid().length);
 
-        assertEquals(grid.getGrid().size(), testSize);
-        for (ArrayList<Cell> cells : grid.getGrid()) {
-            assertEquals(cells.size(), testSize);
+
+        for (int rowNumber = 0; rowNumber < grid.getGridSize(); rowNumber++) {
+            assertEquals("Row=" + rowNumber + " is DEFAULT_GRID_SIZE ", testSize, grid.getRow(rowNumber).length);
         }
     }
 
@@ -53,28 +53,28 @@ public class GridTest extends TestCase {
 
         int row = 0;
         int column = 0;
-        assertNotNull(grid.getCell(row, column));
-        assertSame(grid.getGrid().get(row).get(column), grid.getCell(row, column));
+        assertNotNull(grid.getCellValue(row, column));
+        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
 
         row = 1;
         column = 1;
-        assertNotNull(grid.getCell(row, column));
-        assertSame(grid.getGrid().get(row).get(column), grid.getCell(row, column));
+        assertNotNull(grid.getCellValue(row, column));
+        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
 
         row = grid.getGridSize() - 1;
         column = 1;
-        assertNotNull(grid.getCell(row, column));
-        assertSame(grid.getGrid().get(row).get(column), grid.getCell(row, column));
+        assertNotNull(grid.getCellValue(row, column));
+        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
 
         row = grid.getGridSize() - 1;
         column = grid.getGridSize() - 1;
-        assertNotNull(grid.getCell(row, column));
-        assertSame(grid.getGrid().get(row).get(column), grid.getCell(row, column));
+        assertNotNull(grid.getCellValue(row, column));
+        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
 
         row = grid.getGridSize();
         column = grid.getGridSize();
         try {
-            assertNotNull(grid.getCell(row, column));
+            assertNotNull(grid.getCellValue(row, column));
             Assert.fail("Expected ArrayIndexOutOfBoundsException for index >= grid size");
         } catch (ArrayIndexOutOfBoundsException e) {
             //works as expected
@@ -88,7 +88,7 @@ public class GridTest extends TestCase {
         //First assign a value to each cell
         for (int row = 0; row < grid.getGridSize(); row++) {
             for (int column = 0; column < grid.getGridSize(); column++) {
-                grid.getCell(row, column).setValue(row + column);
+                grid.setCellValue(row, column, row + column);
             }
         }
 
@@ -97,7 +97,7 @@ public class GridTest extends TestCase {
         //then check if each cell has no value anymore after reset
         for (int row = 0; row < grid.getGridSize(); row++) {
             for (int column = 0; column < grid.getGridSize(); column++) {
-                assertFalse(grid.getCell(row, column).hasValue());
+                assertEquals("Cell [" + row + "," + column + "] has value", false, grid.cellHasValue(row, column));
             }
         }
     }
@@ -108,16 +108,16 @@ public class GridTest extends TestCase {
 
         assertTrue(grid.getActiveCells() == 0);
 
-        grid.getCell(0, 0).setValue(1337);
+        grid.setCellValue(0, 0, 1337);
 
         assertTrue(grid.getActiveCells() == 1);
 
-        grid.getCell(0, 0).setValue(42);
+        grid.setCellValue(0, 0, 42);
 
         assertTrue(grid.getActiveCells() == 1);
 
 
-        grid.getCell(1, 1).setValue(31337);
+        grid.setCellValue(1, 1, 31337);
         assertTrue(grid.getActiveCells() == 2);
 
         grid.reset();
@@ -129,22 +129,13 @@ public class GridTest extends TestCase {
         Grid grid = new Grid(4);
         assertTrue(grid.getActiveCells() == 0);
 
-        grid.getCell(0, 0).setValue(1);
-        grid.getCell(0, 1).setValue(2);
-        grid.getCell(0, 2).setValue(3);
-        grid.getCell(0, 3).setValue(4);
-        grid.getCell(1, 0).setValue(5);
-        grid.getCell(1, 1).setValue(6);
-        grid.getCell(1, 2).setValue(7);
-        grid.getCell(1, 3).setValue(8);
-        grid.getCell(2, 0).setValue(9);
-        grid.getCell(2, 1).setValue(10);
-        grid.getCell(2, 2).setValue(11);
-        grid.getCell(2, 3).setValue(12);
-        grid.getCell(3, 0).setValue(13);
-        grid.getCell(3, 1).setValue(14);
-        grid.getCell(3, 2).setValue(15);
-        grid.getCell(3, 3).setValue(16);
+
+        int counter = 1;
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                grid.setCellValue(row, column, counter++);
+            }
+        }
 
         assertTrue(grid.getActiveCells() == 16);
 
@@ -152,26 +143,26 @@ public class GridTest extends TestCase {
 
         assertTrue(grid.getActiveCells() == 16);
 
-        assertEquals(1, (int) grid.getCell(0, 0).getValue());
-        assertEquals(6, (int) grid.getCell(1, 1).getValue());
-        assertEquals(11, (int) grid.getCell(2, 2).getValue());
-        assertEquals(16, (int) grid.getCell(3, 3).getValue());
+        assertEquals(1, grid.getCellValue(0, 0));
+        assertEquals(6, grid.getCellValue(1, 1));
+        assertEquals(11, grid.getCellValue(2, 2));
+        assertEquals(16, grid.getCellValue(3, 3));
 
-        assertEquals(2, (int) grid.getCell(1, 0).getValue());
-        assertEquals(3, (int) grid.getCell(2, 0).getValue());
-        assertEquals(4, (int) grid.getCell(3, 0).getValue());
+        assertEquals(2, grid.getCellValue(1, 0));
+        assertEquals(3, grid.getCellValue(2, 0));
+        assertEquals(4, grid.getCellValue(3, 0));
 
-        assertEquals(5, (int) grid.getCell(0, 1).getValue());
-        assertEquals(7, (int) grid.getCell(2, 1).getValue());
-        assertEquals(8, (int) grid.getCell(3, 1).getValue());
+        assertEquals(5, grid.getCellValue(0, 1));
+        assertEquals(7, grid.getCellValue(2, 1));
+        assertEquals(8, grid.getCellValue(3, 1));
 
-        assertEquals(9, (int) grid.getCell(0, 2).getValue());
-        assertEquals(10, (int) grid.getCell(1, 2).getValue());
-        assertEquals(12, (int) grid.getCell(3, 2).getValue());
+        assertEquals(9, grid.getCellValue(0, 2));
+        assertEquals(10, grid.getCellValue(1, 2));
+        assertEquals(12, grid.getCellValue(3, 2));
 
-        assertEquals(13, (int) grid.getCell(0, 3).getValue());
-        assertEquals(14, (int) grid.getCell(1, 3).getValue());
-        assertEquals(15, (int) grid.getCell(2, 3).getValue());
+        assertEquals(13, grid.getCellValue(0, 3));
+        assertEquals(14, grid.getCellValue(1, 3));
+        assertEquals(15, grid.getCellValue(2, 3));
     }
 
     public void testReverseEachRow() throws Exception {
@@ -179,22 +170,12 @@ public class GridTest extends TestCase {
         Grid grid = new Grid(4);
         assertTrue(grid.getActiveCells() == 0);
 
-        grid.getCell(0, 0).setValue(1);
-        grid.getCell(0, 1).setValue(2);
-        grid.getCell(0, 2).setValue(3);
-        grid.getCell(0, 3).setValue(4);
-        grid.getCell(1, 0).setValue(5);
-        grid.getCell(1, 1).setValue(6);
-        grid.getCell(1, 2).setValue(7);
-        grid.getCell(1, 3).setValue(8);
-        grid.getCell(2, 0).setValue(9);
-        grid.getCell(2, 1).setValue(10);
-        grid.getCell(2, 2).setValue(11);
-        grid.getCell(2, 3).setValue(12);
-        grid.getCell(3, 0).setValue(13);
-        grid.getCell(3, 1).setValue(14);
-        grid.getCell(3, 2).setValue(15);
-        grid.getCell(3, 3).setValue(16);
+        int counter = 1;
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                grid.setCellValue(row, column, counter++);
+            }
+        }
 
         assertTrue(grid.getActiveCells() == 16);
 
@@ -202,26 +183,25 @@ public class GridTest extends TestCase {
 
         assertTrue(grid.getActiveCells() == 16);
 
-        assertEquals(4, (int) grid.getCell(0, 0).getValue());
-        assertEquals(3, (int) grid.getCell(0, 1).getValue());
-        assertEquals(2, (int) grid.getCell(0, 2).getValue());
-        assertEquals(1, (int) grid.getCell(0, 3).getValue());
+        assertEquals("Cell [0,0]", 4, grid.getCellValue(0, 0));
+        assertEquals("Cell [0,1]", 3, grid.getCellValue(0, 1));
+        assertEquals("Cell [0,2]", 2, grid.getCellValue(0, 2));
+        assertEquals("Cell [0,3]", 1, grid.getCellValue(0, 3));
 
-        assertEquals(8, (int) grid.getCell(1, 0).getValue());
-        assertEquals(7, (int) grid.getCell(1, 1).getValue());
-        assertEquals(6, (int) grid.getCell(1, 2).getValue());
-        assertEquals(5, (int) grid.getCell(1, 3).getValue());
+        assertEquals("Cell [1,0]", 8, grid.getCellValue(1, 0));
+        assertEquals("Cell [1,1]", 7, grid.getCellValue(1, 1));
+        assertEquals("Cell [1,2]", 6, grid.getCellValue(1, 2));
+        assertEquals("Cell [1,3]", 5, grid.getCellValue(1, 3));
 
-        assertEquals(12, (int) grid.getCell(2, 0).getValue());
-        assertEquals(11, (int) grid.getCell(2, 1).getValue());
-        assertEquals(10, (int) grid.getCell(2, 2).getValue());
-        assertEquals(9, (int) grid.getCell(2, 3).getValue());
+        assertEquals("Cell [2,0]", 12, grid.getCellValue(2, 0));
+        assertEquals("Cell [2,1]", 11, grid.getCellValue(2, 1));
+        assertEquals("Cell [2,2]", 10, grid.getCellValue(2, 2));
+        assertEquals("Cell [2,3]", 9, grid.getCellValue(2, 3));
 
-        assertEquals(16, (int) grid.getCell(3, 0).getValue());
-        assertEquals(15, (int) grid.getCell(3, 1).getValue());
-        assertEquals(14, (int) grid.getCell(3, 2).getValue());
-        assertEquals(13, (int) grid.getCell(3, 3).getValue());
-
+        assertEquals("Cell [3,0]", 16, grid.getCellValue(3, 0));
+        assertEquals("Cell [3,1]", 15, grid.getCellValue(3, 1));
+        assertEquals("Cell [3,2]", 14, grid.getCellValue(3, 2));
+        assertEquals("Cell [3,3]", 13, grid.getCellValue(3, 3));
     }
 
     public void testRotate90Clockwise() throws Exception {
@@ -230,22 +210,12 @@ public class GridTest extends TestCase {
 
         assertTrue(grid.getActiveCells() == 0);
 
-        grid.getCell(0, 0).setValue(1);
-        grid.getCell(0, 1).setValue(2);
-        grid.getCell(0, 2).setValue(3);
-        grid.getCell(0, 3).setValue(4);
-        grid.getCell(1, 0).setValue(5);
-        grid.getCell(1, 1).setValue(6);
-        grid.getCell(1, 2).setValue(7);
-        grid.getCell(1, 3).setValue(8);
-        grid.getCell(2, 0).setValue(9);
-        grid.getCell(2, 1).setValue(10);
-        grid.getCell(2, 2).setValue(11);
-        grid.getCell(2, 3).setValue(12);
-        grid.getCell(3, 0).setValue(13);
-        grid.getCell(3, 1).setValue(14);
-        grid.getCell(3, 2).setValue(15);
-        grid.getCell(3, 3).setValue(16);
+        int counter = 1;
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                grid.setCellValue(row, column, counter++);
+            }
+        }
 
         assertEquals(16, grid.getActiveCells());
 
@@ -270,29 +240,29 @@ public class GridTest extends TestCase {
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                assertTrue("Cell [" + i + "," + j + "] has value", grid.getCell(i, j).hasValue());
+                assertEquals("Cell [" + i + "," + j + "] has value", true, grid.cellHasValue(i, j));
             }
         }
 
-        assertEquals("Cell [0,0]", 13, (int) grid.getCell(0, 0).getValue());
-        assertEquals("Cell [0,1]", 9, (int) grid.getCell(0, 1).getValue());
-        assertEquals("Cell [0,2]", 5, (int) grid.getCell(0, 2).getValue());
-        assertEquals("Cell [0,3]", 1, (int) grid.getCell(0, 3).getValue());
+        assertEquals("Cell [0,0]", 13, grid.getCellValue(0, 0));
+        assertEquals("Cell [0,1]", 9, grid.getCellValue(0, 1));
+        assertEquals("Cell [0,2]", 5, grid.getCellValue(0, 2));
+        assertEquals("Cell [0,3]", 1, grid.getCellValue(0, 3));
 
-        assertEquals("Cell [1,0]", 14, (int) grid.getCell(1, 0).getValue());
-        assertEquals("Cell [1,1]", 10, (int) grid.getCell(1, 1).getValue());
-        assertEquals("Cell [1,2]", 6, (int) grid.getCell(1, 2).getValue());
-        assertEquals("Cell [1,3]", 2, (int) grid.getCell(1, 3).getValue());
+        assertEquals("Cell [1,0]", 14, grid.getCellValue(1, 0));
+        assertEquals("Cell [1,1]", 10, grid.getCellValue(1, 1));
+        assertEquals("Cell [1,2]", 6, grid.getCellValue(1, 2));
+        assertEquals("Cell [1,3]", 2, grid.getCellValue(1, 3));
 
-        assertEquals("Cell [2,0]", 15, (int) grid.getCell(2, 0).getValue());
-        assertEquals("Cell [2,1]", 11, (int) grid.getCell(2, 1).getValue());
-        assertEquals("Cell [2,2]", 7, (int) grid.getCell(2, 2).getValue());
-        assertEquals("Cell [2,3]", 3, (int) grid.getCell(2, 3).getValue());
+        assertEquals("Cell [2,0]", 15, grid.getCellValue(2, 0));
+        assertEquals("Cell [2,1]", 11, grid.getCellValue(2, 1));
+        assertEquals("Cell [2,2]", 7, grid.getCellValue(2, 2));
+        assertEquals("Cell [2,3]", 3, grid.getCellValue(2, 3));
 
-        assertEquals("Cell [3,0]", 16, (int) grid.getCell(3, 0).getValue());
-        assertEquals("Cell [3,1]", 12, (int) grid.getCell(3, 1).getValue());
-        assertEquals("Cell [3,2]", 8, (int) grid.getCell(3, 2).getValue());
-        assertEquals("Cell [3,3]", 4, (int) grid.getCell(3, 3).getValue());
+        assertEquals("Cell [3,0]", 16, grid.getCellValue(3, 0));
+        assertEquals("Cell [3,1]", 12, grid.getCellValue(3, 1));
+        assertEquals("Cell [3,2]", 8, grid.getCellValue(3, 2));
+        assertEquals("Cell [3,3]", 4, grid.getCellValue(3, 3));
     }
 
 
@@ -300,30 +270,20 @@ public class GridTest extends TestCase {
 
         Grid grid = new Grid(4);
 
-        assertTrue(grid.getActiveCells() == 0);
+        assertEquals("Active cells", 0, grid.getActiveCells());
 
-        grid.getCell(0, 0).setValue(1);
-        grid.getCell(0, 1).setValue(2);
-        grid.getCell(0, 2).setValue(3);
-        grid.getCell(0, 3).setValue(4);
-        grid.getCell(1, 0).setValue(5);
-        grid.getCell(1, 1).setValue(6);
-        grid.getCell(1, 2).setValue(7);
-        grid.getCell(1, 3).setValue(8);
-        grid.getCell(2, 0).setValue(9);
-        grid.getCell(2, 1).setValue(10);
-        grid.getCell(2, 2).setValue(11);
-        grid.getCell(2, 3).setValue(12);
-        grid.getCell(3, 0).setValue(13);
-        grid.getCell(3, 1).setValue(14);
-        grid.getCell(3, 2).setValue(15);
-        grid.getCell(3, 3).setValue(16);
+        int counter = 1;
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                grid.setCellValue(row, column, counter++);
+            }
+        }
 
-        assertEquals(16, grid.getActiveCells());
+        assertEquals("Active cells", 16, grid.getActiveCells());
 
         grid.rotateGrid90(false);
 
-        assertEquals(16, grid.getActiveCells());
+        assertEquals("Active cells", 16, grid.getActiveCells());
 
         /**
          *  |  1 |  2 |  3 |  4 |
@@ -342,29 +302,29 @@ public class GridTest extends TestCase {
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                assertTrue("Cell [" + i + "," + j + "] has value", grid.getCell(i, j).hasValue());
+                assertEquals("Cell [" + i + "," + j + "] has value", true, grid.cellHasValue(i, j));
             }
         }
 
-        assertEquals("Cell [0,0]", 4, (int) grid.getCell(0, 0).getValue());
-        assertEquals("Cell [0,1]", 8, (int) grid.getCell(0, 1).getValue());
-        assertEquals("Cell [0,2]", 12, (int) grid.getCell(0, 2).getValue());
-        assertEquals("Cell [0,3]", 16, (int) grid.getCell(0, 3).getValue());
+        assertEquals("Cell [0,0]", 4, grid.getCellValue(0, 0));
+        assertEquals("Cell [0,1]", 8, grid.getCellValue(0, 1));
+        assertEquals("Cell [0,2]", 12, grid.getCellValue(0, 2));
+        assertEquals("Cell [0,3]", 16, grid.getCellValue(0, 3));
 
-        assertEquals("Cell [1,0]", 3, (int) grid.getCell(1, 0).getValue());
-        assertEquals("Cell [1,1]", 7, (int) grid.getCell(1, 1).getValue());
-        assertEquals("Cell [1,2]", 11, (int) grid.getCell(1, 2).getValue());
-        assertEquals("Cell [1,3]", 15, (int) grid.getCell(1, 3).getValue());
+        assertEquals("Cell [1,0]", 3, grid.getCellValue(1, 0));
+        assertEquals("Cell [1,1]", 7, grid.getCellValue(1, 1));
+        assertEquals("Cell [1,2]", 11, grid.getCellValue(1, 2));
+        assertEquals("Cell [1,3]", 15, grid.getCellValue(1, 3));
 
-        assertEquals("Cell [2,0]", 2, (int) grid.getCell(2, 0).getValue());
-        assertEquals("Cell [2,1]", 6, (int) grid.getCell(2, 1).getValue());
-        assertEquals("Cell [2,2]", 10, (int) grid.getCell(2, 2).getValue());
-        assertEquals("Cell [2,3]", 14, (int) grid.getCell(2, 3).getValue());
+        assertEquals("Cell [2,0]", 2, grid.getCellValue(2, 0));
+        assertEquals("Cell [2,1]", 6, grid.getCellValue(2, 1));
+        assertEquals("Cell [2,2]", 10, grid.getCellValue(2, 2));
+        assertEquals("Cell [2,3]", 14, grid.getCellValue(2, 3));
 
-        assertEquals("Cell [3,0]", 1, (int) grid.getCell(3, 0).getValue());
-        assertEquals("Cell [3,1]", 5, (int) grid.getCell(3, 1).getValue());
-        assertEquals("Cell [3,2]", 9, (int) grid.getCell(3, 2).getValue());
-        assertEquals("Cell [3,3]", 13, (int) grid.getCell(3, 3).getValue());
+        assertEquals("Cell [3,0]", 1, grid.getCellValue(3, 0));
+        assertEquals("Cell [3,1]", 5, grid.getCellValue(3, 1));
+        assertEquals("Cell [3,2]", 9, grid.getCellValue(3, 2));
+        assertEquals("Cell [3,3]", 13, grid.getCellValue(3, 3));
     }
 
 
@@ -372,30 +332,20 @@ public class GridTest extends TestCase {
 
         Grid grid = new Grid(4);
 
-        assertTrue(grid.getActiveCells() == 0);
+        assertEquals("Active cells", 0, grid.getActiveCells());
 
-        grid.getCell(0, 0).setValue(1);
-        grid.getCell(0, 1).setValue(2);
-        grid.getCell(0, 2).setValue(3);
-        grid.getCell(0, 3).setValue(4);
-        grid.getCell(1, 0).setValue(5);
-        grid.getCell(1, 1).setValue(6);
-        grid.getCell(1, 2).setValue(7);
-        grid.getCell(1, 3).setValue(8);
-        grid.getCell(2, 0).setValue(9);
-        grid.getCell(2, 1).setValue(10);
-        grid.getCell(2, 2).setValue(11);
-        grid.getCell(2, 3).setValue(12);
-        grid.getCell(3, 0).setValue(13);
-        grid.getCell(3, 1).setValue(14);
-        grid.getCell(3, 2).setValue(15);
-        grid.getCell(3, 3).setValue(16);
+        int counter = 1;
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                grid.setCellValue(row, column, counter++);
+            }
+        }
 
-        assertEquals(16, grid.getActiveCells());
+        assertEquals("Active cells", 16, grid.getActiveCells());
 
         grid.rotateGrid180();
 
-        assertEquals(16, grid.getActiveCells());
+        assertEquals("Active cells", 16, grid.getActiveCells());
 
         /**
          *  |  1 |  2 |  3 |  4 |
@@ -414,28 +364,28 @@ public class GridTest extends TestCase {
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                assertTrue("Cell [" + i + "," + j + "] has value", grid.getCell(i, j).hasValue());
+                assertEquals("Cell [" + i + "," + j + "] has value", true, grid.cellHasValue(i, j));
             }
         }
 
-        assertEquals("Cell [0,0]", 16, (int) grid.getCell(0, 0).getValue());
-        assertEquals("Cell [0,1]", 15, (int) grid.getCell(0, 1).getValue());
-        assertEquals("Cell [0,2]", 14, (int) grid.getCell(0, 2).getValue());
-        assertEquals("Cell [0,3]", 13, (int) grid.getCell(0, 3).getValue());
+        assertEquals("Cell [0,0]", 16, grid.getCellValue(0, 0));
+        assertEquals("Cell [0,1]", 15, grid.getCellValue(0, 1));
+        assertEquals("Cell [0,2]", 14, grid.getCellValue(0, 2));
+        assertEquals("Cell [0,3]", 13, grid.getCellValue(0, 3));
 
-        assertEquals("Cell [1,0]", 12, (int) grid.getCell(1, 0).getValue());
-        assertEquals("Cell [1,1]", 11, (int) grid.getCell(1, 1).getValue());
-        assertEquals("Cell [1,2]", 10, (int) grid.getCell(1, 2).getValue());
-        assertEquals("Cell [1,3]", 9, (int) grid.getCell(1, 3).getValue());
+        assertEquals("Cell [1,0]", 12, grid.getCellValue(1, 0));
+        assertEquals("Cell [1,1]", 11, grid.getCellValue(1, 1));
+        assertEquals("Cell [1,2]", 10, grid.getCellValue(1, 2));
+        assertEquals("Cell [1,3]", 9, grid.getCellValue(1, 3));
 
-        assertEquals("Cell [2,0]", 8, (int) grid.getCell(2, 0).getValue());
-        assertEquals("Cell [2,1]", 7, (int) grid.getCell(2, 1).getValue());
-        assertEquals("Cell [2,2]", 6, (int) grid.getCell(2, 2).getValue());
-        assertEquals("Cell [2,3]", 5, (int) grid.getCell(2, 3).getValue());
+        assertEquals("Cell [2,0]", 8, grid.getCellValue(2, 0));
+        assertEquals("Cell [2,1]", 7, grid.getCellValue(2, 1));
+        assertEquals("Cell [2,2]", 6, grid.getCellValue(2, 2));
+        assertEquals("Cell [2,3]", 5, grid.getCellValue(2, 3));
 
-        assertEquals("Cell [3,0]", 4, (int) grid.getCell(3, 0).getValue());
-        assertEquals("Cell [3,1]", 3, (int) grid.getCell(3, 1).getValue());
-        assertEquals("Cell [3,2]", 2, (int) grid.getCell(3, 2).getValue());
-        assertEquals("Cell [3,3]", 1, (int) grid.getCell(3, 3).getValue());
+        assertEquals("Cell [3,0]", 4, grid.getCellValue(3, 0));
+        assertEquals("Cell [3,1]", 3, grid.getCellValue(3, 1));
+        assertEquals("Cell [3,2]", 2, grid.getCellValue(3, 2));
+        assertEquals("Cell [3,3]", 1, grid.getCellValue(3, 3));
     }
 }

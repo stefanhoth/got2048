@@ -33,7 +33,7 @@ public class MCP {
 
         Cell cell = playlingField.getRandomCell();
 
-        cell.setValue(DEFAULT_START_VALUE);
+        playlingField.setCellValue(cell.getRow(), cell.getColumn(), DEFAULT_START_VALUE);
 
         Cell nextCell = playlingField.getRandomCell();
 
@@ -42,19 +42,17 @@ public class MCP {
                 nextCell = playlingField.getRandomCell();
             }
 
-            nextCell.setValue(DEFAULT_START_VALUE);
+            playlingField.setCellValue(nextCell.getRow(), nextCell.getColumn(), DEFAULT_START_VALUE);
             cell = nextCell;
         }
     }
 
     public void move(MOVE_DIRECTION direction) {
 
-        if (!direction.equals(MOVE_DIRECTION.RIGHT)) {
-            throw new UnsupportedOperationException("Only right is implemented so far!");
-        }
+        playlingField.moveCells(direction);
+    }
 
-        //left to right
-        playlingField.moveCells();
-
+    protected boolean cellHasValue(int row, int column) {
+        return playlingField.cellHasValue(row, column);
     }
 }
