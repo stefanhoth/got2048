@@ -54,6 +54,7 @@
 
     <de.stefanhoth.android.got2048.widgets.SquareGridView xmlns:squaregrid="http://schemas.android.com/apk/res-auto"
 
+        android:id="@+id/playing_field"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
@@ -64,5 +65,14 @@
         android:padding="10dp"
 
         squaregrid:gridsize="4" />
+
+    <TextView
+        android:id="@+id/game_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@android:style/TextAppearance.Holo.Large"
+        android:textColor="@android:color/holo_red_light"
+        android:gravity="center"
+        tools:text="GAME OVER" />
 
 </LinearLayout>

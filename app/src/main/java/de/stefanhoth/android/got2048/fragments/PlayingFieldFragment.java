@@ -6,8 +6,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import de.stefanhoth.android.got2048.Got2048App;
 import de.stefanhoth.android.got2048.R;
+import de.stefanhoth.android.got2048.logic.MCP;
+import de.stefanhoth.android.got2048.widgets.SquareGridView;
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
@@ -18,11 +24,19 @@ import de.stefanhoth.android.got2048.R;
  * create an instance of this fragment.
  *
  */
-public class PlayingFieldFragment extends Fragment {
+public class PlayingFieldFragment extends Fragment implements MCP.GridUpdateListener {
+
+
     private static final String KEY_LAST_HIGHSCORE = "KEY_LAST_HIGHSCORE";
 
     private int mCurrentScore;
     private int mLastHighScore;
+
+    @InjectView(R.id.playing_field)
+    SquareGridView mSquareGridView;
+
+    @InjectView(R.id.game_status)
+    TextView mGameStatus;
 
     private OnPlayingFieldEventListener mListener;
 
@@ -55,7 +69,14 @@ public class PlayingFieldFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_playing_field, container, false);
+        View view = inflater.inflate(R.layout.fragment_playing_field, container, false);
+        ButterKnife.inject(this, view);
+
+        if (getActivity() != null) {
+            ((Got2048App) getActivity().getApplication()).getMCP().addGridUpdateListeners(this);
+        }
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -80,6 +101,30 @@ public class PlayingFieldFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (getActivity() != null) {
+            ((Got2048App) getActivity().getApplication()).getMCP().removeGridUpdateListeners(this);
+        }
+    }
+
+    @Override
+    public void gridUpdated(int[][] updatedGrid) {
+        mSquareGridView.updateGrid(updatedGrid);
+    }
+
+    @Override
+    public void gameOver() {
+        mGameStatus.setText("GAME OVER");
+    }
+
+    @Override
+    public void gameWon() {
+        mGameStatus.setText("YOU WON!");
     }
 
     /**

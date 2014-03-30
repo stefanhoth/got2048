@@ -16,6 +16,7 @@ public class Grid {
     private static final String TAG = Grid.class.getSimpleName();
     protected static final int DEFAULT_GRID_SIZE = 4;
     protected static final int DEFAULT_EMPTY_VALUE = -1;
+    protected static final int DEFAULT_WON_VALUE = 2048;
 
     private int[][] grid;
     private int gridSize;
@@ -104,8 +105,8 @@ public class Grid {
         return gridSize;
     }
 
-    protected int[][] getGrid() {
-        return grid;
+    public int[][] getGridStatus() {
+        return grid.clone();
     }
 
     public int getActiveCells() {
@@ -166,7 +167,14 @@ public class Grid {
         return builder.toString();
     }
 
-    public void moveCells(MOVE_DIRECTION direction) {
+    public boolean moveCells(MOVE_DIRECTION direction) {
+        return moveCells(direction, false);
+    }
+
+    private boolean moveCells(MOVE_DIRECTION direction, boolean simulate) {
+
+        boolean hasMovedCells = false;
+        int[][] restoreGrid = getGridStatus();
 
         // taking the easy route: always make the move from
         // left to right by turning the grid in this direction
@@ -216,6 +224,7 @@ public class Grid {
                     setCellValue(row, rightNeighborColumn, currentCellValue);
                     Log.v(TAG, "moveCells: Clearing value of cell [" + row + "," + column + "]");
                     resetCell(row, currentColumn);
+                    hasMovedCells = true;
 
                     if (rightNeighborColumn + 1 == getRow(row).length) {
                         Log.v(TAG, "moveCells: Row is completely moved, cell [" + row + "," + rightNeighborColumn + "] was last.");
@@ -227,10 +236,13 @@ public class Grid {
                 }
 
                 if (canCellsMerge(row, currentColumn, row, rightNeighborColumn)) {
+
                     Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can and will be merged");
                     setCellValue(row, rightNeighborColumn, getCellValue(row, currentColumn) + getCellValue(row, rightNeighborColumn));
                     resetCell(row, currentColumn);
                     setCellImmune(row, rightNeighborColumn);
+                    hasMovedCells = true;
+
                 } else {
                     Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can't be merged");
                 }
@@ -264,7 +276,12 @@ public class Grid {
                 break;
         }
 
-        Log.d(TAG, "moveCells: Direction adjustment reverted.");
+        if (simulate) {
+            grid = restoreGrid;
+        }
+
+        Log.d(TAG, "moveCells: Direction adjustment reverted. Move done.");
+        return hasMovedCells;
     }
 
     protected void rotateGrid90(boolean clockwise) {
@@ -370,5 +387,35 @@ public class Grid {
 
     public boolean cellHasValue(int row, int column) {
         return getCellValue(row, column) > DEFAULT_EMPTY_VALUE;
+    }
+
+    public boolean wouldMoveCells(MOVE_DIRECTION direction) {
+
+        return moveCells(direction, true);
+    }
+
+    public boolean isGameOver() {
+
+        for (MOVE_DIRECTION direction : MOVE_DIRECTION.values()) {
+            if (wouldMoveCells(direction)) {
+                return false;
+            }
+        }
+
+        //if we can't move anymore, we have lost
+        return true;
+    }
+
+    public boolean isGameWon() {
+
+        for (int row = 0; row < grid.length; row++) {
+            for (int column = 0; column < getRow(row).length; column++) {
+                if (grid[row][column] == DEFAULT_WON_VALUE) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
