@@ -80,15 +80,25 @@ public class MCP {
     }
 
     public void move(MOVE_DIRECTION direction) {
+        move(direction, true);
+    }
+
+    protected void move(MOVE_DIRECTION direction, boolean spawnNewCell) {
 
         if (gameStopped) {
+            Log.w(TAG, "move: Game is stopped. Not accepting any movement at this time.");
             return;
         }
 
         if (playlingField.wouldMoveCells(direction)) {
+            Log.v(TAG, "move: Executing move to " + direction + ".");
             playlingField.moveCells(direction);
-            addNewCell();
+            if (spawnNewCell) {
+                addNewCell();
+            }
             updateGridStatusListeners();
+        } else {
+            Log.d(TAG, "move: Move to " + direction + " wouldn't move any cells, so nothing is happening.");
         }
 
         if (playlingField.isGameOver()) {
