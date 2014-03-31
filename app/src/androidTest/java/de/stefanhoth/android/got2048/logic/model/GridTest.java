@@ -25,8 +25,8 @@ public class GridTest extends TestCase {
         Grid grid = new Grid();
         assertNotNull("Grid is not null", grid);
         assertEquals("Gridsize is DEFAULT_GRID_SIZE", Grid.DEFAULT_GRID_SIZE, grid.getGridSize());
-        assertNotNull("Grid.getGrid not null", grid.getGrid());
-        assertEquals("Actual grid is DEFAULT_GRID_SIZE", Grid.DEFAULT_GRID_SIZE, grid.getGrid().length);
+        assertNotNull("Grid.getGrid not null", grid.getGridStatus());
+        assertEquals("Actual grid is DEFAULT_GRID_SIZE", Grid.DEFAULT_GRID_SIZE, grid.getGridStatus().length);
 
 
         for (int rowNumber = 0; rowNumber < grid.getGridSize(); rowNumber++) {
@@ -38,8 +38,8 @@ public class GridTest extends TestCase {
 
         assertNotNull("Grid is not null", grid);
         assertEquals("Gridsize is DEFAULT_GRID_SIZE", testSize, grid.getGridSize());
-        assertNotNull("Grid.getGrid not null", grid.getGrid());
-        assertEquals("Actual grid is DEFAULT_GRID_SIZE", testSize, grid.getGrid().length);
+        assertNotNull("Grid.getGrid not null", grid.getGridStatus());
+        assertEquals("Actual grid is DEFAULT_GRID_SIZE", testSize, grid.getGridStatus().length);
 
 
         for (int rowNumber = 0; rowNumber < grid.getGridSize(); rowNumber++) {
@@ -54,22 +54,22 @@ public class GridTest extends TestCase {
         int row = 0;
         int column = 0;
         assertNotNull(grid.getCellValue(row, column));
-        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
+        assertSame(grid.getGridStatus()[row][column], grid.getCellValue(row, column));
 
         row = 1;
         column = 1;
         assertNotNull(grid.getCellValue(row, column));
-        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
+        assertSame(grid.getGridStatus()[row][column], grid.getCellValue(row, column));
 
         row = grid.getGridSize() - 1;
         column = 1;
         assertNotNull(grid.getCellValue(row, column));
-        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
+        assertSame(grid.getGridStatus()[row][column], grid.getCellValue(row, column));
 
         row = grid.getGridSize() - 1;
         column = grid.getGridSize() - 1;
         assertNotNull(grid.getCellValue(row, column));
-        assertSame(grid.getGrid()[row][column], grid.getCellValue(row, column));
+        assertSame(grid.getGridStatus()[row][column], grid.getCellValue(row, column));
 
         row = grid.getGridSize();
         column = grid.getGridSize();
@@ -128,7 +128,6 @@ public class GridTest extends TestCase {
 
         Grid grid = new Grid(4);
         assertTrue(grid.getActiveCells() == 0);
-
 
         int counter = 1;
         for (int row = 0; row < 4; row++) {
