@@ -87,7 +87,9 @@ public class Grid {
     }
 
     public void resetCell(int row, int column) {
+        Log.v(TAG, "resetCell: Resetting value and immunity of cell [" + row + "," + column + "]");
         setCellValue(row, column, DEFAULT_EMPTY_VALUE);
+        cellImmunities.remove(row + "-" + column);
     }
 
     public void reset() {
@@ -106,7 +108,14 @@ public class Grid {
     }
 
     public int[][] getGridStatus() {
-        return grid.clone();
+
+        int length = grid.length;
+        int[][] target = new int[length][grid[0].length];
+        for (int i = 0; i < length; i++) {
+            System.arraycopy(grid[i], 0, target[i], 0, grid[i].length);
+        }
+
+        return target;
     }
 
     public int getActiveCells() {
@@ -204,7 +213,7 @@ public class Grid {
 
                 currentCellValue = getCellValue(row, column);
 
-                Log.d(TAG, "moveCells: Direction adjustment done.");
+                Log.d(TAG, "moveCells: Checking move for cell [" + row + "," + column + "]=" + currentCellValue);
                 if (currentCellValue == DEFAULT_EMPTY_VALUE) {
                     //no value, nothing to move nor merge
                     Log.v(TAG, "moveCells: Cell [" + row + "," + column + "] is empty, nothing to move.");
@@ -222,6 +231,11 @@ public class Grid {
 
                     Log.v(TAG, "moveCells: Moving cell [" + row + "," + currentColumn + "] with value=" + currentCellValue + " to cell [" + row + "," + rightNeighborColumn + "]");
                     setCellValue(row, rightNeighborColumn, currentCellValue);
+                    if (isCellImmune(row, currentColumn)) {
+                        Log.v(TAG, "moveCells: Keeping immunity of cell [" + row + "," + currentColumn + "] intact by assigning it to cell [" + row + "," + rightNeighborColumn + "]");
+                        setCellImmune(row, rightNeighborColumn);
+                    }
+
                     Log.v(TAG, "moveCells: Clearing value of cell [" + row + "," + column + "]");
                     resetCell(row, currentColumn);
                     hasMovedCells = true;
@@ -247,9 +261,9 @@ public class Grid {
                     Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can't be merged");
                 }
 
-                Log.v(TAG, "moveCells: Movement and merging for row=" + row + " done.");
                 //no movement, no merging = do nothing and move on
             }
+            Log.v(TAG, "moveCells: Movement and merging for row=" + row + " done.");
         }
 
         Log.v(TAG, "moveCells: Movement done.");
@@ -360,7 +374,7 @@ public class Grid {
     }
 
     private void resetCellImmunities() {
-
+        Log.v(TAG, "resetCellImmunities: Clearing list of immune cells");
         cellImmunities.clear();
     }
 
@@ -368,6 +382,7 @@ public class Grid {
 
         if (getCellValue(currentCellRow, currentCellColumn) == DEFAULT_EMPTY_VALUE ||
                 getCellValue(rightNeighborCellRow, rightNeighborCellColumn) == DEFAULT_EMPTY_VALUE ||
+                isCellImmune(currentCellRow, currentCellColumn) ||
                 isCellImmune(rightNeighborCellRow, rightNeighborCellColumn)
                 ) {
 
@@ -378,10 +393,12 @@ public class Grid {
     }
 
     private void setCellImmune(int row, int column) {
+        Log.v(TAG, "setCellImmune: Adding immunity to cell [" + row + "," + column + "]");
         cellImmunities.add(row + "-" + column);
     }
 
-    private boolean isCellImmune(int row, int column) {
+    boolean isCellImmune(int row, int column) {
+        Log.v(TAG, "isCellImmune: Cell [" + row + "," + column + "]=" + cellImmunities.contains(row + "-" + column));
         return cellImmunities.contains(row + "-" + column);
     }
 
