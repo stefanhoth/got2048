@@ -5,6 +5,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.9.+'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
         classpath 'com.deploygate:gradle:0.6'
     }
@@ -19,6 +20,7 @@ if(secretPropsFile.exists()) {
     throw new InvalidUserDataException("Please make sure the API secrects file exists at '"+secretPropsFile.getAbsolutePath()+"'")
 }
 
+apply plugin: 'android-sdk-manager'
 apply plugin: 'android'
 
 android {
