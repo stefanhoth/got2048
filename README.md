@@ -21,6 +21,6 @@ As long as the game is under development you can see it evolve here. You need to
 
 Glad to hear your feedback!
 
- - Drop me a line at stefanhoth.de <a t> gmail.com
+ - Drop me a line at stefanhoth.de [a t] gmail.com
  - Find me on [Google+](https://google.me/+StefanHoth) 
  - Ping me on [Twitter @stefanhoth](https://twitter.com/stefanhoth).
