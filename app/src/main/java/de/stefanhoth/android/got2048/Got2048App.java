@@ -20,8 +20,7 @@ public class Got2048App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        masterControlProgram = new MCP(mGridsize);
-        masterControlProgram.addStartCells();
+        masterControlProgram = new MCP(getBaseContext(), mGridsize);
     }
 
     public MCP getMCP() {

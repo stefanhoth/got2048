@@ -1,9 +1,10 @@
 package de.stefanhoth.android.got2048.logic;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import de.stefanhoth.android.got2048.logic.model.Cell;
 import de.stefanhoth.android.got2048.logic.model.Grid;
@@ -21,21 +22,36 @@ public class MCP {
     private static final String TAG = MCP.class.getName();
     protected static final int DEFAULT_START_FIELDS = 2;
     protected static final int DEFAULT_START_VALUE = 2;
+    protected static final int DEFAULT_WON_VALUE = 2048;
+
+    public static final String BROADCAST_MCP = MCP.class.getPackage() + ".BROADCAST_MCP";
+
+    public static final String BROADCAST_ACTION_MOVE_START = MCP.class.getPackage() + ".action.MOVE_START";
+    public static final String BROADCAST_ACTION_MOVE_DONE = MCP.class.getPackage() + ".action.MOVE_DONE";
+    public static final String BROADCAST_ACTION_ADD_POINTS = MCP.class.getPackage() + ".action.ADD_POINTS";
+    public static final String BROADCAST_ACTION_GAME_WON = MCP.class.getPackage() + ".action.GAME_WON";
+    public static final String BROADCAST_ACTION_GAME_OVER = MCP.class.getPackage() + ".action.GAME_OVER";
+    public static final String KEY_DIRECTION = MCP.class.getPackage() + ".key.DIRECTION";
+    public static final String KEY_MOVEMENTS = MCP.class.getPackage() + ".key.MOVEMENTS";
+    public static final String KEY_POINTS_ADDED = MCP.class.getPackage() + ".key.POINTS_ADDED";
+    private final Context mContext;
+
     private Grid playlingField;
-    private boolean gameStopped;
+    private boolean mGameStopped;
+    private boolean mCurrentlyMoving;
 
-    private List<GridUpdateListener> gridUpdateListeners;
-
-    public MCP() {
+    public MCP(Context context) {
+        mContext = context;
         playlingField = new Grid();
-        gridUpdateListeners = new ArrayList<>();
-        gameStopped = false;
+        mGameStopped = false;
+        mCurrentlyMoving = false;
     }
 
-    public MCP(int gridSize) {
+    public MCP(Context context, int gridSize) {
+        mContext = context;
         playlingField = new Grid(gridSize);
-        gridUpdateListeners = new ArrayList<>();
-        gameStopped = false;
+        mGameStopped = false;
+        mCurrentlyMoving = false;
     }
 
     protected Grid getPlaylingField() {
@@ -59,7 +75,7 @@ public class MCP {
             cell = nextCell;
         }
 
-        updateGridStatusListeners();
+        updateMoveDoneListeners();
     }
 
     public void addNewCell() {
@@ -85,69 +101,85 @@ public class MCP {
 
     protected void move(MOVE_DIRECTION direction, boolean spawnNewCell) {
 
-        if (gameStopped) {
+        if (mGameStopped) {
             Log.w(TAG, "move: Game is stopped. Not accepting any movement at this time.");
+            return;
+        } else if (mCurrentlyMoving) {
+            Log.d(TAG, "move: Currently working on a move, not accepting further input until done");
             return;
         }
 
+        mCurrentlyMoving = true;
+
         if (playlingField.wouldMoveCells(direction)) {
+            updateMoveStartListeners(direction);
+
             Log.v(TAG, "move: Executing move to " + direction + ".");
             playlingField.moveCells(direction);
             if (spawnNewCell) {
                 addNewCell();
             }
-            updateGridStatusListeners();
+            updateMoveDoneListeners();
         } else {
             Log.d(TAG, "move: Move to " + direction + " wouldn't move any cells, so nothing is happening.");
         }
 
         if (playlingField.isGameOver()) {
-            gameStopped = true;
+            mGameStopped = true;
             updateGameOverListeners();
-        } else if (playlingField.isGameWon()) {
-            gameStopped = true;
+        } else if (playlingField.isGameWon(DEFAULT_WON_VALUE)) {
+            mGameStopped = true;
             updateGameWonListeners();
         }
 
+        mCurrentlyMoving = false;
     }
 
-    private void updateGridStatusListeners() {
+    private void updateMoveStartListeners(MOVE_DIRECTION direction) {
 
-        for (GridUpdateListener gridUpdateListener : gridUpdateListeners) {
-            gridUpdateListener.gridUpdated(playlingField.getGridStatus());
-        }
+        Bundle extras = new Bundle();
+        extras.putSerializable(KEY_DIRECTION, direction.ordinal());
+
+        sendLocalBroadcast(BROADCAST_ACTION_MOVE_START, extras);
+    }
+
+    private void updateMoveDoneListeners() {
+
+        Bundle extras = new Bundle();
+        extras.putSerializable(KEY_MOVEMENTS, playlingField.getGridStatus());
+
+        sendLocalBroadcast(BROADCAST_ACTION_MOVE_DONE, extras);
+    }
+
+    private void updatePointsAddedListeners(int pointsAdded) {
+
+        Bundle extras = new Bundle();
+        extras.putInt(KEY_POINTS_ADDED, pointsAdded);
+
+        sendLocalBroadcast(BROADCAST_ACTION_ADD_POINTS, extras);
     }
 
     private void updateGameOverListeners() {
 
-        for (GridUpdateListener gridUpdateListener : gridUpdateListeners) {
-            gridUpdateListener.gameOver();
-        }
+        sendLocalBroadcast(BROADCAST_ACTION_GAME_OVER, null);
     }
 
     private void updateGameWonListeners() {
 
-        for (GridUpdateListener gridUpdateListener : gridUpdateListeners) {
-            gridUpdateListener.gameWon();
+        sendLocalBroadcast(BROADCAST_ACTION_GAME_WON, null);
+    }
+
+    private void sendLocalBroadcast(String action, Bundle extras) {
+
+        Intent localIntent =
+                new Intent(BROADCAST_MCP)
+                        .setAction(action);
+
+        if (extras != null && !extras.isEmpty()) {
+            localIntent.putExtras(extras);
         }
+
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(localIntent);
+
     }
-
-    public void removeGridUpdateListeners(GridUpdateListener listener) {
-        gridUpdateListeners.remove(listener);
-    }
-
-    public void addGridUpdateListeners(GridUpdateListener listener) {
-        this.gridUpdateListeners.add(listener);
-        //get a fresh update after registration
-        updateGridStatusListeners();
-    }
-
-    public interface GridUpdateListener {
-        public void gridUpdated(int[][] updatedGrid);
-
-        public void gameOver();
-
-        public void gameWon();
-    }
-
 }
