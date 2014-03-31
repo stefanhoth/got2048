@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.crashlytics.android.Crashlytics;
 
+import de.stefanhoth.android.got2048.GameEngineService;
 import de.stefanhoth.android.got2048.Got2048App;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment;
@@ -123,6 +124,16 @@ public class GameActivity extends Activity
         }
 
         Log.d(TAG, "onMovementRecognized: Received swipe to " + direction);
-        ((Got2048App) getApplication()).getMCP().move(direction);
+        GameEngineService.startActionMove(getBaseContext(), direction);
     }
+
+    @Override
+    public void onPlayingFieldReady() {
+
+        Log.d(TAG, "onPlayingFieldReady: View is ready for gaming. Starting game.");
+        GameEngineService.startActionStartGame(getBaseContext());
+
+    }
+
+
 }

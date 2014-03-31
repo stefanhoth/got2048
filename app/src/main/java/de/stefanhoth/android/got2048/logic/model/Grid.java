@@ -16,7 +16,6 @@ public class Grid {
     private static final String TAG = Grid.class.getSimpleName();
     protected static final int DEFAULT_GRID_SIZE = 4;
     protected static final int DEFAULT_EMPTY_VALUE = -1;
-    protected static final int DEFAULT_WON_VALUE = 2048;
 
     private int[][] grid;
     private int gridSize;
@@ -423,11 +422,11 @@ public class Grid {
         return true;
     }
 
-    public boolean isGameWon() {
+    public boolean isGameWon(int wonThreshold) {
 
         for (int row = 0; row < grid.length; row++) {
             for (int column = 0; column < getRow(row).length; column++) {
-                if (grid[row][column] == DEFAULT_WON_VALUE) {
+                if (grid[row][column] >= wonThreshold) {
                     return true;
                 }
             }
