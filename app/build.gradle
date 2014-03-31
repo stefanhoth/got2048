@@ -1,18 +1,25 @@
 buildscript {
     repositories {
+        mavenCentral()
         maven { url 'http://download.crashlytics.com/maven' }
     }
 
     dependencies {
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'com.deploygate:gradle:0.6'
     }
 }
-apply plugin: 'android'
-//apply plugin: 'crashlytics'
-repositories {
-    maven { url 'http://download.crashlytics.com/maven' }
+
+File secretPropsFile = file('../secret.properties');
+Properties secretProps = new Properties();
+
+if(secretPropsFile.exists()) {
+    secretProps.load(new FileInputStream(secretPropsFile))
+}else{
+    throw new InvalidUserDataException("Please make sure the API secrects file exists at '"+secretPropsFile.getAbsolutePath()+"'")
 }
 
+apply plugin: 'android'
 
 android {
     compileSdkVersion 19
@@ -53,6 +60,10 @@ android {
     }
 }
 
+
+repositories {
+    maven { url 'http://download.crashlytics.com/maven' }
+}
 dependencies {
     compile 'com.android.support:support-v4:+'
     compile 'junit:junit:3.+'
@@ -60,4 +71,77 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.crashlytics.android:crashlytics:1.+'
 
+}
+
+// Override Data in Manifest
+android.applicationVariants.each { variant ->
+    variant.processManifest.doLast {
+        copy {
+            // *** SET COPY PATHS ***
+            try {
+                from("${buildDir}/manifests") {
+                    //println "from: ${buildDir}/manifests"
+                    include "${variant.dirName}/AndroidManifest.xml"
+                    //println "included: ${variant.dirName}/AndroidManifest.xml"
+                }
+            } catch (e) {
+                println "error: " + e
+            }
+
+            into("${buildDir}/manifests/${variant.name}")
+
+            filter {
+                String line ->
+                    line.replaceAll("CRASHLYTICS_API_KEY", secretProps.getProperty("de.stefanhoth.android.got2048.CRASHLYTICS_API_KEY"));
+            }
+        }
+    }
+
+    // *** SET PATH TO NEW MANIFEST ***
+    variant.processResources.manifestFile = file("${buildDir}/manifests/${variant.name}/${variant.dirName}/AndroidManifest.xml")
+
+    variant.processManifest.doLast {
+
+        // STUPID  plugin checks for  API key and can't handle proper resource resolution
+        // so we have to replace the key on the fly before activating it
+        apply plugin: 'crashlytics'
+    }
+}
+
+apply plugin: 'deploygate'
+
+deploygate {
+    userName = "stefanhoth"
+    token = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_TOKEN")
+
+    apks {
+        beta {
+            sourceFile = file("build/apk/app-beta-unaligned.apk")
+
+            def betaComment = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_RELEASE_NOTES")
+            if (betaComment.length() > 0) {
+                releaseNote = betaComment
+                message = betaComment
+            }
+
+            if(secretProps.hasProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")) {
+                distributionKey = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")
+            }
+        }
+    }
+}
+
+def getReleaseNotes(flavor){
+
+    return readLine('> Please enter the release notes for flavor ['+flavor+']: ')
+}
+
+def readLine(String format, Object... args) throws IOException {
+    if (System.console() != null) {
+        return System.console().readLine(format, args);
+    }
+    println(String.format(format, args))
+    BufferedReader reader = new BufferedReader(new InputStreamReader(
+            System.in));
+    return reader.readLine();
 }

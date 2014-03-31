@@ -22,11 +22,11 @@
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="@string/CRASHLYTICS_API_KEY" />
+            android:value="CRASHLYTICS_API_KEY" />
 
         <service
             android:name="de.stefanhoth.android.got2048.GameEngineService"
-            android:exported="false"></service>
+            android:exported="false"/>
     </application>
 
 </manifest>
