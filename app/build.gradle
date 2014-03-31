@@ -40,6 +40,12 @@ android {
             versionNameSuffix "-DEBUG"
         }
 
+        beta.initWith(debug)
+        beta {
+            versionNameSuffix "-BETA"
+            packageNameSuffix ".beta"
+        }
+
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
