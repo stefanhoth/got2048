@@ -75,21 +75,21 @@ if (secretProps.containsKey("DEPLOYGATE_USERNAME") && secretProps.containsKey("D
     apply plugin: 'deploygate'
 
     project.configure(deploygate, {
-        userName = secretProps.getProperty("DEPLOYGATE_USERNAME")
-        token = secretProps.getProperty("DEPLOYGATE_TOKEN")
+        userName = secretProps.get("DEPLOYGATE_USERNAME")
+        token = secretProps.get("DEPLOYGATE_TOKEN")
 
         apks {
             beta {
                 sourceFile = file("build/apk/app-beta-unaligned.apk")
 
-                def betaComment = secretProps.getProperty("DEPLOYGATE_RELEASE_NOTES")
+                def betaComment = secretProps.get("DEPLOYGATE_RELEASE_NOTES")
                 if (betaComment != null && betaComment.length() > 0) {
                     releaseNote = betaComment
                     message = betaComment
                 }
 
-                if (secretProps.hasProperty("DEPLOYGATE_DISTRIBUTION_ID")) {
-                    distributionKey = secretProps.getProperty("DEPLOYGATE_DISTRIBUTION_ID")
+                if (secretProps.containsKey("DEPLOYGATE_DISTRIBUTION_ID")) {
+                    distributionKey = secretProps.get("DEPLOYGATE_DISTRIBUTION_ID")
                 }
             }
         }
