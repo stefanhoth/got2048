@@ -2,6 +2,8 @@ package de.stefanhoth.android.got2048;
 
 import android.app.Application;
 
+import com.deploygate.sdk.DeployGate;
+
 import de.stefanhoth.android.got2048.logic.MCP;
 
 /**
@@ -19,6 +21,7 @@ public class Got2048App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        DeployGate.install(this);
 
         masterControlProgram = new MCP(getBaseContext(), mGridsize);
     }

@@ -11,6 +11,7 @@ before_install:
   - tar xzf android-sdk_r22.3-linux.tgz
   - export ANDROID_HOME=$PWD/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+  - chmod a+x ./gradlew
 
   # Install required components.
   # For a full list, run `android list sdk -a --extended`
