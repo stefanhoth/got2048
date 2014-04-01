@@ -14,10 +14,10 @@ buildscript {
 File secretPropsFile = file('../secret.properties');
 Properties secretProps = new Properties();
 
-if(secretPropsFile.exists()) {
+if (secretPropsFile.exists()) {
     secretProps.load(new FileInputStream(secretPropsFile))
-}else{
-    throw new InvalidUserDataException("Please make sure the API secrects file exists at '"+secretPropsFile.getAbsolutePath()+"'")
+} else {
+    throw new InvalidUserDataException("Please make sure the API secrects file exists at '" + secretPropsFile.getAbsolutePath() + "'")
 }
 
 apply plugin: 'android-sdk-manager'
@@ -25,7 +25,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.1"
+    buildToolsVersion "19.0.3"
 
     defaultConfig {
         minSdkVersion 15
@@ -126,16 +126,16 @@ deploygate {
                 message = betaComment
             }
 
-            if(secretProps.hasProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")) {
+            if (secretProps.hasProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")) {
                 distributionKey = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")
             }
         }
     }
 }
 
-def getReleaseNotes(flavor){
+def getReleaseNotes(flavor) {
 
-    return readLine('> Please enter the release notes for flavor ['+flavor+']: ')
+    return readLine('> Please enter the release notes for flavor [' + flavor + ']: ')
 }
 
 def readLine(String format, Object... args) throws IOException {
