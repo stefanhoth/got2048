@@ -1,5 +1,7 @@
 package de.stefanhoth.android.got2048.fragments;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
@@ -14,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +61,7 @@ public class PlayingFieldFragment extends Fragment {
     private GestureDetector mGestureDetector;
     private View.OnTouchListener mGestureListener;
     private McpEventReceiver mMcpEventReceiver;
+    private boolean mReadyAnnounced;
 
     /**
      * Use this factory method to create a new instance of
@@ -79,6 +83,7 @@ public class PlayingFieldFragment extends Fragment {
         super();
         mHighscore = 0;
         mCurrentScore = 0;
+        mReadyAnnounced = false;
     }
 
     @Override
@@ -156,9 +161,13 @@ public class PlayingFieldFragment extends Fragment {
                 );
 
         Log.d(TAG, "onAttach: View is ready for playing.");
-        announceReady();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        announceReady();
+    }
 
     @Override
     public void onDetach() {
@@ -241,9 +250,34 @@ public class PlayingFieldFragment extends Fragment {
 
     private void announceReady() {
 
+        if (mReadyAnnounced) {
+            return;
+        }
+
         if (mPlayingFieldEventListener != null) {
             mPlayingFieldEventListener.onPlayingFieldReady();
         }
+
+        float translateBy = 50f;
+        int startDelay = 1000;
+        int duration = 300;
+
+        ObjectAnimator animXRight = ObjectAnimator.ofFloat(mSquareGridView, "translationX", translateBy);
+        ObjectAnimator animXLeft = ObjectAnimator.ofFloat(mSquareGridView, "translationX", -translateBy);
+        ObjectAnimator animXReset = ObjectAnimator.ofFloat(mSquareGridView, "translationX", 0);
+        ObjectAnimator animYUp = ObjectAnimator.ofFloat(mSquareGridView, "translationY", -translateBy);
+        ObjectAnimator animYDown = ObjectAnimator.ofFloat(mSquareGridView, "translationY", translateBy);
+        ObjectAnimator animYReset = ObjectAnimator.ofFloat(mSquareGridView, "translationY", 0);
+
+        AnimatorSet bouncer = new AnimatorSet();
+        bouncer.playSequentially(animXRight, animXLeft, animXReset, animYUp, animYDown, animYReset);
+
+        bouncer.setStartDelay(startDelay);
+        bouncer.setDuration(duration);
+        bouncer.setInterpolator(new AccelerateDecelerateInterpolator());
+        bouncer.start();
+
+        mReadyAnnounced = true;
     }
 
     private void announceMovement(MOVE_DIRECTION direction) {
@@ -251,6 +285,39 @@ public class PlayingFieldFragment extends Fragment {
         if (mPlayingFieldEventListener != null) {
             mPlayingFieldEventListener.onMovementRecognized(direction);
         }
+
+        String property;
+        float movement = 50f;
+
+        switch (direction) {
+
+            case UP:
+                property = "translationY";
+                movement = -movement;
+                break;
+            case DOWN:
+                property = "translationY";
+                break;
+            case LEFT:
+                property = "translationX";
+                movement = -movement;
+                break;
+            case RIGHT:
+                property = "translationX";
+                break;
+            default:
+                return;
+        }
+
+        ObjectAnimator animOut = ObjectAnimator.ofFloat(mSquareGridView, property, movement);
+        ObjectAnimator animIn = ObjectAnimator.ofFloat(mSquareGridView, property, 0);
+
+        AnimatorSet bouncer = new AnimatorSet();
+        bouncer.playSequentially(animOut, animIn);
+        bouncer.setDuration(200);
+        bouncer.setInterpolator(new AccelerateDecelerateInterpolator());
+        bouncer.start();
+
     }
 
     // Broadcast receiver for receiving status updates from the IntentService
