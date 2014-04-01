@@ -368,6 +368,7 @@ public class PlayingFieldFragment extends Fragment {
                 MovementChanges changes = intent.getParcelableExtra(MCP.KEY_MOVEMENT_CHANGES);
 
                 mSquareGridView.updateGrid(changes.gridStatus);
+                mSquareGridView.addCells(changes.getAddedCells(), changes.addedCellsValue);
                 //TODO animate new points
                 mCurrentScore += changes.pointsEarned;
                 mTvCurrentScore.setText(String.valueOf(mCurrentScore));

@@ -73,11 +73,11 @@ public class MCP {
         updateMoveDoneListeners(new MovementChanges(getPlaylingField().getGridStatus()));
     }
 
-    public void addNewCell() {
+    public MovementChanges addNewCell(MovementChanges changes) {
 
         if (playlingField.getActiveCells() == (playlingField.getGridSize() * playlingField.getGridSize())) {
             Log.i(TAG, "addNewCell: Field is full. Can't add new cell.");
-            return;
+            return changes;
         }
 
         Cell cell;
@@ -87,7 +87,10 @@ public class MCP {
 
         } while (playlingField.cellHasValue(cell.getRow(), cell.getColumn()));
 
+        changes.addCell(cell, DEFAULT_START_VALUE);
         playlingField.setCellValue(cell.getRow(), cell.getColumn(), DEFAULT_START_VALUE);
+
+        return changes;
     }
 
     public void move(MOVE_DIRECTION direction) {
@@ -112,8 +115,7 @@ public class MCP {
             Log.v(TAG, "move: Executing move to " + direction + ".");
             MovementChanges changes = playlingField.moveCells(direction);
             if (spawnNewCell) {
-                addNewCell();
-                changes.gridStatus = playlingField.getGridStatus();
+                changes = addNewCell(changes);
             }
             updateMoveDoneListeners(changes);
         } else {

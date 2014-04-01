@@ -1,5 +1,8 @@
 package de.stefanhoth.android.got2048.logic.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Represents one cell on the playing field
  *
@@ -7,7 +10,7 @@ package de.stefanhoth.android.got2048.logic.model;
  *         date: 20.03.14 20:25
  * @since 0.1
  */
-public class Cell {
+public class Cell implements Parcelable {
 
     private int row;
     private int column;
@@ -25,10 +28,11 @@ public class Cell {
         return column;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || ((Object) this).getClass() != o.getClass()) return false;
 
         Cell cell = (Cell) o;
 
@@ -45,4 +49,30 @@ public class Cell {
         result = 31 * result + column;
         return result;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.row);
+        dest.writeInt(this.column);
+    }
+
+    private Cell(Parcel in) {
+        this.row = in.readInt();
+        this.column = in.readInt();
+    }
+
+    public static Parcelable.Creator<Cell> CREATOR = new Parcelable.Creator<Cell>() {
+        public Cell createFromParcel(Parcel source) {
+            return new Cell(source);
+        }
+
+        public Cell[] newArray(int size) {
+            return new Cell[size];
+        }
+    };
 }

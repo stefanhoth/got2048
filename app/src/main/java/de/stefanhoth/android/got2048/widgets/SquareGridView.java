@@ -1,5 +1,8 @@
 package de.stefanhoth.android.got2048.widgets;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -7,12 +10,17 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.stefanhoth.android.got2048.R;
+import de.stefanhoth.android.got2048.logic.model.Cell;
 
 /**
  * TODO describe class
@@ -112,6 +120,45 @@ public class SquareGridView extends GridView {
         }
         invalidate();
         requestLayout();
+    }
+
+    public void addCells(List<Cell> cellList, int value) {
+
+        if (cellList == null || cellList.size() == 0) {
+            Log.d(TAG, "addCells: No or empty cell list given. Won't add cells.");
+            return;
+        }
+
+        AnimatorSet set = new AnimatorSet();
+
+
+        Collection<Animator> animators = new ArrayList<>(cellList.size());
+
+        for (Cell cell : cellList) {
+            animators.addAll(addAndAnimateCell(cell, value));
+        }
+
+        set.playTogether(animators);
+        set.setDuration(500);
+        set.setInterpolator(new BounceInterpolator());
+        set.start();
+    }
+
+    private List<Animator> addAndAnimateCell(Cell cell, int value) {
+        SquareCellView cellView = cells[cell.getRow()][cell.getColumn()];
+
+        cellView.setScaleX(0.1f);
+        cellView.setScaleY(0.1f);
+        cellView.setAlpha(0.1f);
+
+        cellView.setValue(value);
+
+        List<Animator> animations = new ArrayList<>(2);
+        animations.add(ObjectAnimator.ofFloat(cellView, "scaleX", 1f));
+        animations.add(ObjectAnimator.ofFloat(cellView, "scaleY", 1f));
+        animations.add(ObjectAnimator.ofFloat(cellView, "alpha", 1f));
+
+        return animations;
     }
 
     @Override
