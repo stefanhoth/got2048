@@ -14,6 +14,7 @@ import de.stefanhoth.android.got2048.Got2048App;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment;
 import de.stefanhoth.android.got2048.fragments.PlayingFieldFragment;
+import de.stefanhoth.android.got2048.helpers.SettingsHelper;
 import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
 
 
@@ -46,9 +47,12 @@ public class GameActivity extends Activity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+
+        int highscore = SettingsHelper.loadHighscore(getBaseContext());
+
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlayingFieldFragment.newInstance(1337)) //TODO save/load to sharedprefs
+                .replace(R.id.container, PlayingFieldFragment.newInstance(highscore))
                 .commit();
     }
 

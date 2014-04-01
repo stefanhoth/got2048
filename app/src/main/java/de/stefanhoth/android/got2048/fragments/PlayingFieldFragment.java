@@ -20,6 +20,7 @@ import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.stefanhoth.android.got2048.R;
+import de.stefanhoth.android.got2048.helpers.SettingsHelper;
 import de.stefanhoth.android.got2048.logic.MCP;
 import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
 import de.stefanhoth.android.got2048.logic.model.MovementChanges;
@@ -35,11 +36,11 @@ import de.stefanhoth.android.got2048.widgets.SquareGridView;
  */
 public class PlayingFieldFragment extends Fragment {
 
-    private static final String KEY_LAST_HIGHSCORE = "KEY_LAST_HIGHSCORE";
+    private static final String KEY_HIGHSCORE = "KEY_HIGHSCORE";
     private static final String TAG = PlayingFieldFragment.class.getName();
 
     private int mCurrentScore;
-    private int mLastHighScore;
+    private int mHighscore;
 
     @InjectView(R.id.playing_field)
     SquareGridView mSquareGridView;
@@ -48,10 +49,10 @@ public class PlayingFieldFragment extends Fragment {
     TextView mGameStatus;
 
     @InjectView(R.id.txt_score_current)
-    TextView mTxtCurrentScore;
+    TextView mTvCurrentScore;
 
     @InjectView(R.id.txt_score_best)
-    TextView mTxtBestScore;
+    TextView mTvHighscore;
 
     private OnPlayingFieldEventListener mPlayingFieldEventListener;
     private GestureDetector mGestureDetector;
@@ -62,13 +63,13 @@ public class PlayingFieldFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param lastHighscore The last highscore of the player
+     * @param lastHighscore The last mHighscore of the player
      * @return A new instance of fragment PlayingFieldFragment.
      */
     public static PlayingFieldFragment newInstance(int lastHighscore) {
         PlayingFieldFragment fragment = new PlayingFieldFragment();
         Bundle args = new Bundle();
-        args.putInt(KEY_LAST_HIGHSCORE, lastHighscore);
+        args.putInt(KEY_HIGHSCORE, lastHighscore);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,7 +77,7 @@ public class PlayingFieldFragment extends Fragment {
     public PlayingFieldFragment() {
         // Required empty public constructor
         super();
-        mLastHighScore = 0;
+        mHighscore = 0;
         mCurrentScore = 0;
     }
 
@@ -86,7 +87,7 @@ public class PlayingFieldFragment extends Fragment {
         setRetainInstance(true);
 
         if (getArguments() != null) {
-            mLastHighScore = getArguments().getInt(KEY_LAST_HIGHSCORE);
+            mHighscore = getArguments().getInt(KEY_HIGHSCORE);
         }
     }
 
@@ -96,8 +97,12 @@ public class PlayingFieldFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_playing_field, container, false);
         ButterKnife.inject(this, view);
 
-        mTxtBestScore.setText(String.valueOf(mLastHighScore));
-        mTxtCurrentScore.setText(String.valueOf(mCurrentScore));
+        if (mHighscore > 0) {
+            mTvHighscore.setText(String.valueOf(mHighscore));
+        } else {
+            mTvHighscore.setText("-");
+        }
+        mTvCurrentScore.setText(String.valueOf(mCurrentScore));
 
         // Gesture detection
         mGestureDetector = new GestureDetector(container.getContext(), new MyGestureDetector());
@@ -140,7 +145,6 @@ public class PlayingFieldFragment extends Fragment {
         IntentFilter mStatusIntentFilter = new IntentFilter();
         mStatusIntentFilter.addAction(MCP.BROADCAST_ACTION_MOVE_START);
         mStatusIntentFilter.addAction(MCP.BROADCAST_ACTION_MOVE_DONE);
-        mStatusIntentFilter.addAction(MCP.BROADCAST_ACTION_ADD_POINTS);
         mStatusIntentFilter.addAction(MCP.BROADCAST_ACTION_GAME_WON);
         mStatusIntentFilter.addAction(MCP.BROADCAST_ACTION_GAME_OVER);
 
@@ -272,8 +276,6 @@ public class PlayingFieldFragment extends Fragment {
                 handleMoveStart(intent);
             } else if (action.equalsIgnoreCase(MCP.BROADCAST_ACTION_MOVE_DONE)) {
                 handleMoveDone(intent);
-            } else if (action.equalsIgnoreCase(MCP.BROADCAST_ACTION_ADD_POINTS)) {
-                handleAddPoints(intent);
             } else if (action.equalsIgnoreCase(MCP.BROADCAST_ACTION_GAME_OVER)) {
                 handleGameOver(intent);
             } else if (action.equalsIgnoreCase(MCP.BROADCAST_ACTION_GAME_WON)) {
@@ -301,31 +303,41 @@ public class PlayingFieldFragment extends Fragment {
                 mSquareGridView.updateGrid(changes.gridStatus);
                 //TODO animate new points
                 mCurrentScore += changes.pointsEarned;
-                mTxtCurrentScore.setText(String.valueOf(mCurrentScore));
+                mTvCurrentScore.setText(String.valueOf(mCurrentScore));
 
-            } catch (Exception e) {
-                Log.e(TAG, "Could not read movements from broadcast.", e);
-            }
-        }
-
-        private void handleAddPoints(Intent intent) {
-            try {
-                int pointsAdded = intent.getIntExtra(MCP.KEY_POINTS_ADDED, 0);
-                if (pointsAdded > 0) {
-                    Toast.makeText(getActivity().getBaseContext(), pointsAdded + " points added to score", Toast.LENGTH_SHORT).show();
-                }
             } catch (Exception e) {
                 Log.e(TAG, "Could not read movements from broadcast.", e);
             }
         }
 
         private void handleGameOver(Intent intent) {
+
+            checkHighscore();
+
             mGameStatus.setText("GAME OVER");
         }
 
         private void handleGameWon(Intent intent) {
+
+            checkHighscore();
+
             mGameStatus.setText("YOU WON!");
         }
     }
 
+    private void checkHighscore() {
+
+        if (mCurrentScore > mHighscore) {
+            //TODO do something visually fancy
+            Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
+            SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore);
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTvHighscore.setText(String.valueOf(mCurrentScore));
+                }
+            });
+        }
+    }
 }
