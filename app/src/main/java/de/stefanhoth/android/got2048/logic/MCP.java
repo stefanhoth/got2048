@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.deploygate.sdk.DeployGate;
+
 import de.stefanhoth.android.got2048.logic.model.Cell;
 import de.stefanhoth.android.got2048.logic.model.Grid;
 import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
@@ -52,9 +54,12 @@ public class MCP {
 
     public void addStartCells() {
 
+        MovementChanges changes = new MovementChanges(getPlaylingField().getGridStatus());
+
         Cell cell = playlingField.getRandomCell();
 
         playlingField.setCellValue(cell.getRow(), cell.getColumn(), DEFAULT_START_VALUE);
+        changes.addCell(cell, DEFAULT_START_VALUE);
 
         Cell nextCell = playlingField.getRandomCell();
 
@@ -65,17 +70,17 @@ public class MCP {
 
             playlingField.setCellValue(nextCell.getRow(), nextCell.getColumn(), DEFAULT_START_VALUE);
             cell = nextCell;
+            changes.addCell(cell, DEFAULT_START_VALUE);
         }
 
-
-        updateMoveDoneListeners(new MovementChanges(getPlaylingField().getGridStatus()));
+        updateMoveDoneListeners(changes);
     }
 
-    public void addNewCell() {
+    public MovementChanges addNewCell(MovementChanges changes) {
 
         if (playlingField.getActiveCells() == (playlingField.getGridSize() * playlingField.getGridSize())) {
             Log.i(TAG, "addNewCell: Field is full. Can't add new cell.");
-            return;
+            return changes;
         }
 
         Cell cell;
@@ -85,7 +90,10 @@ public class MCP {
 
         } while (playlingField.cellHasValue(cell.getRow(), cell.getColumn()));
 
+        changes.addCell(cell, DEFAULT_START_VALUE);
         playlingField.setCellValue(cell.getRow(), cell.getColumn(), DEFAULT_START_VALUE);
+
+        return changes;
     }
 
     public void move(MOVE_DIRECTION direction) {
@@ -110,8 +118,7 @@ public class MCP {
             Log.v(TAG, "move: Executing move to " + direction + ".");
             MovementChanges changes = playlingField.moveCells(direction);
             if (spawnNewCell) {
-                addNewCell();
-                changes.gridStatus = playlingField.getGridStatus();
+                changes = addNewCell(changes);
             }
             updateMoveDoneListeners(changes);
         } else {
@@ -148,14 +155,26 @@ public class MCP {
     private void updateGameOverListeners() {
 
         sendLocalBroadcast(BROADCAST_ACTION_GAME_OVER, null);
+
+        String username = DeployGate.getLoginUsername();
+        String message = String.format("%s just LOST a game.", (username == null) ? "UNKNOWN" : username);
+        DeployGate.logInfo(message);
     }
 
     private void updateGameWonListeners() {
 
         sendLocalBroadcast(BROADCAST_ACTION_GAME_WON, null);
+        String username = DeployGate.getLoginUsername();
+        String message = String.format("%s just WON a game.", (username == null) ? "UNKNOWN" : username);
+        DeployGate.logInfo(message);
     }
 
     private void sendLocalBroadcast(String action, Bundle extras) {
+
+        if (mContext == null) {
+            Log.e(TAG, "sendLocalBroadcast: Context=null, can't broadcast action=" + action);
+            return;
+        }
 
         Intent localIntent =
                 new Intent(BROADCAST_MCP)
