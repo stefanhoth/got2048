@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.deploygate.sdk.DeployGate;
+
 import de.stefanhoth.android.got2048.logic.model.Cell;
 import de.stefanhoth.android.got2048.logic.model.Grid;
 import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
@@ -148,11 +150,18 @@ public class MCP {
     private void updateGameOverListeners() {
 
         sendLocalBroadcast(BROADCAST_ACTION_GAME_OVER, null);
+
+        String username = DeployGate.getLoginUsername();
+        String message = String.format("%s just LOST a game.", (username == null) ? "UNKNOWN" : username);
+        DeployGate.logInfo(message);
     }
 
     private void updateGameWonListeners() {
 
         sendLocalBroadcast(BROADCAST_ACTION_GAME_WON, null);
+        String username = DeployGate.getLoginUsername();
+        String message = String.format("%s just WON a game.", (username == null) ? "UNKNOWN" : username);
+        DeployGate.logInfo(message);
     }
 
     private void sendLocalBroadcast(String action, Bundle extras) {
