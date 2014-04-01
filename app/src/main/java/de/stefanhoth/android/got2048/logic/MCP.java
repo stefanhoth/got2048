@@ -54,9 +54,12 @@ public class MCP {
 
     public void addStartCells() {
 
+        MovementChanges changes = new MovementChanges(getPlaylingField().getGridStatus());
+
         Cell cell = playlingField.getRandomCell();
 
         playlingField.setCellValue(cell.getRow(), cell.getColumn(), DEFAULT_START_VALUE);
+        changes.addCell(cell, DEFAULT_START_VALUE);
 
         Cell nextCell = playlingField.getRandomCell();
 
@@ -67,10 +70,10 @@ public class MCP {
 
             playlingField.setCellValue(nextCell.getRow(), nextCell.getColumn(), DEFAULT_START_VALUE);
             cell = nextCell;
+            changes.addCell(cell, DEFAULT_START_VALUE);
         }
 
-
-        updateMoveDoneListeners(new MovementChanges(getPlaylingField().getGridStatus()));
+        updateMoveDoneListeners(changes);
     }
 
     public MovementChanges addNewCell(MovementChanges changes) {
