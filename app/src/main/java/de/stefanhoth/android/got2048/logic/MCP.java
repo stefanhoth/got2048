@@ -9,6 +9,7 @@ import android.util.Log;
 import de.stefanhoth.android.got2048.logic.model.Cell;
 import de.stefanhoth.android.got2048.logic.model.Grid;
 import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
+import de.stefanhoth.android.got2048.logic.model.MovementChanges;
 
 /**
  * TODO describe class
@@ -32,7 +33,7 @@ public class MCP {
     public static final String BROADCAST_ACTION_GAME_WON = MCP.class.getPackage() + ".action.GAME_WON";
     public static final String BROADCAST_ACTION_GAME_OVER = MCP.class.getPackage() + ".action.GAME_OVER";
     public static final String KEY_DIRECTION = MCP.class.getPackage() + ".key.DIRECTION";
-    public static final String KEY_MOVEMENTS = MCP.class.getPackage() + ".key.MOVEMENTS";
+    public static final String KEY_MOVEMENT_CHANGES = MCP.class.getPackage() + ".key.MOVEMENTS";
     public static final String KEY_POINTS_ADDED = MCP.class.getPackage() + ".key.POINTS_ADDED";
     private final Context mContext;
 
@@ -75,7 +76,8 @@ public class MCP {
             cell = nextCell;
         }
 
-        updateMoveDoneListeners();
+
+        updateMoveDoneListeners(new MovementChanges(getPlaylingField().getGridStatus()));
     }
 
     public void addNewCell() {
@@ -115,11 +117,12 @@ public class MCP {
             updateMoveStartListeners(direction);
 
             Log.v(TAG, "move: Executing move to " + direction + ".");
-            playlingField.moveCells(direction);
+            MovementChanges changes = playlingField.moveCells(direction);
             if (spawnNewCell) {
                 addNewCell();
+                changes.gridStatus = playlingField.getGridStatus();
             }
-            updateMoveDoneListeners();
+            updateMoveDoneListeners(changes);
         } else {
             Log.d(TAG, "move: Move to " + direction + " wouldn't move any cells, so nothing is happening.");
         }
@@ -143,10 +146,10 @@ public class MCP {
         sendLocalBroadcast(BROADCAST_ACTION_MOVE_START, extras);
     }
 
-    private void updateMoveDoneListeners() {
+    private void updateMoveDoneListeners(MovementChanges changes) {
 
         Bundle extras = new Bundle();
-        extras.putSerializable(KEY_MOVEMENTS, playlingField.getGridStatus());
+        extras.putParcelable(KEY_MOVEMENT_CHANGES, changes);
 
         sendLocalBroadcast(BROADCAST_ACTION_MOVE_DONE, extras);
     }

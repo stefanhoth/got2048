@@ -175,13 +175,16 @@ public class Grid {
         return builder.toString();
     }
 
-    public boolean moveCells(MOVE_DIRECTION direction) {
+    public MovementChanges moveCells(MOVE_DIRECTION direction) {
         return moveCells(direction, false);
     }
 
-    private boolean moveCells(MOVE_DIRECTION direction, boolean simulate) {
+    private MovementChanges moveCells(MOVE_DIRECTION direction, boolean simulate) {
 
-        boolean hasMovedCells = false;
+        MovementChanges changes = new MovementChanges(getGridStatus());
+        changes.cellsMoved = false;
+        changes.pointsEarned = 0;
+
         int[][] restoreGrid = getGridStatus();
 
         // taking the easy route: always make the move from
@@ -206,7 +209,7 @@ public class Grid {
 
         Log.d(TAG, "moveCells: Direction adjustment done.");
 
-        int currentCellValue, currentColumn, rightNeighborColumn;
+        int currentCellValue, currentColumn, rightNeighborColumn, addedPoints;
         for (int row = 0; row < grid.length; row++) {
             for (int column = grid[row].length - 2; column >= 0; column--) { //start at the end of the row but one next to it (last position can't move anymore)
 
@@ -237,7 +240,7 @@ public class Grid {
 
                     Log.v(TAG, "moveCells: Clearing value of cell [" + row + "," + column + "]");
                     resetCell(row, currentColumn);
-                    hasMovedCells = true;
+                    changes.cellsMoved = true;
 
                     if (rightNeighborColumn + 1 == getRow(row).length) {
                         Log.v(TAG, "moveCells: Row is completely moved, cell [" + row + "," + rightNeighborColumn + "] was last.");
@@ -251,10 +254,12 @@ public class Grid {
                 if (canCellsMerge(row, currentColumn, row, rightNeighborColumn)) {
 
                     Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can and will be merged");
-                    setCellValue(row, rightNeighborColumn, getCellValue(row, currentColumn) + getCellValue(row, rightNeighborColumn));
+                    addedPoints = getCellValue(row, currentColumn) + getCellValue(row, rightNeighborColumn);
+                    setCellValue(row, rightNeighborColumn, addedPoints);
                     resetCell(row, currentColumn);
                     setCellImmune(row, rightNeighborColumn);
-                    hasMovedCells = true;
+                    changes.cellsMoved = true;
+                    changes.pointsEarned += addedPoints;
 
                 } else {
                     Log.v(TAG, "moveCells: Cell [" + row + "," + currentColumn + "]=" + getCellValue(row, currentColumn) + " and cell [" + row + "," + rightNeighborColumn + "]=" + getCellValue(row, rightNeighborColumn) + " can't be merged");
@@ -293,8 +298,11 @@ public class Grid {
             grid = restoreGrid;
         }
 
+        changes.gridStatus = getGridStatus();
+
         Log.d(TAG, "moveCells: Direction adjustment reverted. Move done.");
-        return hasMovedCells;
+
+        return changes;
     }
 
     protected void rotateGrid90(boolean clockwise) {
@@ -407,7 +415,7 @@ public class Grid {
 
     public boolean wouldMoveCells(MOVE_DIRECTION direction) {
 
-        return moveCells(direction, true);
+        return moveCells(direction, true).cellsMoved;
     }
 
     public boolean isGameOver() {
