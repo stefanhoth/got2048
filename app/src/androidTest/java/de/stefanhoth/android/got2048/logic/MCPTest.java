@@ -30,7 +30,7 @@ public class MCPTest extends TestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        mcp = new MCP();
+        mcp = new MCP(null, 4);
     }
 
     @Override

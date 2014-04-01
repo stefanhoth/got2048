@@ -157,6 +157,11 @@ public class MCP {
 
     private void sendLocalBroadcast(String action, Bundle extras) {
 
+        if (mContext == null) {
+            Log.e(TAG, "sendLocalBroadcast: Context=null, can't broadcast action=" + action);
+            return;
+        }
+
         Intent localIntent =
                 new Intent(BROADCAST_MCP)
                         .setAction(action);
