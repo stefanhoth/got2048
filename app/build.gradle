@@ -15,9 +15,11 @@ File secretPropsFile = file('../secret.properties');
 Properties secretProps = new Properties();
 
 if (secretPropsFile.exists()) {
+    logger.info("DeployGate API configured using properties at '" + secretPropsFile.getAbsolutePath() + "'")
     secretProps.load(new FileInputStream(secretPropsFile))
 } else {
-    throw new InvalidUserDataException("Please make sure the API secrects file exists at '" + secretPropsFile.getAbsolutePath() + "'")
+    logger.warn("DeployGate API not configured, tasks won't be available. Please make sure the API secrects file exists at '" + secretPropsFile.getAbsolutePath() + "'")
+
 }
 
 apply plugin: 'android-sdk-manager'
@@ -94,7 +96,7 @@ android.applicationVariants.each { variant ->
 
             filter {
                 String line ->
-                    line.replaceAll("CRASHLYTICS_API_KEY", secretProps.getProperty("de.stefanhoth.android.got2048.CRASHLYTICS_API_KEY"));
+                    line.replaceAll("CRASHLYTICS_API_KEY", secretProps.getProperty("CRASHLYTICS_API_KEY"));
             }
         }
     }
@@ -110,27 +112,31 @@ android.applicationVariants.each { variant ->
     }
 }
 
-apply plugin: 'deploygate'
+if (secretProps.hasProperty("DEPLOYGATE_USERNAME") && secretProps.hasProperty("DEPLOYGATE_TOKEN")) {
 
-deploygate {
-    userName = "stefanhoth"
-    token = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_TOKEN")
+    apply plugin: 'deploygate'
 
-    apks {
-        beta {
-            sourceFile = file("build/apk/app-beta-unaligned.apk")
+    deploygate {
+        userName = secretProps.getProperty("DEPLOYGATE_USERNAME")
+        token = secretProps.getProperty("DEPLOYGATE_TOKEN")
 
-            def betaComment = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_RELEASE_NOTES")
-            if (betaComment.length() > 0) {
-                releaseNote = betaComment
-                message = betaComment
-            }
+        apks {
+            beta {
+                sourceFile = file("build/apk/app-beta-unaligned.apk")
 
-            if (secretProps.hasProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")) {
-                distributionKey = secretProps.getProperty("de.stefanhoth.android.got2048.DEPLOYGATE_DISTRIBUTION_ID")
+                def betaComment = secretProps.getProperty("DEPLOYGATE_RELEASE_NOTES")
+                if (betaComment != null && betaComment.length() > 0) {
+                    releaseNote = betaComment
+                    message = betaComment
+                }
+
+                if (secretProps.hasProperty("DEPLOYGATE_DISTRIBUTION_ID")) {
+                    distributionKey = secretProps.getProperty("DEPLOYGATE_DISTRIBUTION_ID")
+                }
             }
         }
     }
+
 }
 
 def getReleaseNotes(flavor) {
@@ -138,6 +144,7 @@ def getReleaseNotes(flavor) {
     return readLine('> Please enter the release notes for flavor [' + flavor + ']: ')
 }
 
+// workaround to Windows not having System.console
 def readLine(String format, Object... args) throws IOException {
     if (System.console() != null) {
         return System.console().readLine(format, args);
