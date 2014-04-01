@@ -22,6 +22,7 @@ import butterknife.InjectView;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.logic.MCP;
 import de.stefanhoth.android.got2048.logic.model.MOVE_DIRECTION;
+import de.stefanhoth.android.got2048.logic.model.MovementChanges;
 import de.stefanhoth.android.got2048.widgets.SquareGridView;
 
 /**
@@ -46,6 +47,12 @@ public class PlayingFieldFragment extends Fragment {
     @InjectView(R.id.game_status)
     TextView mGameStatus;
 
+    @InjectView(R.id.txt_score_current)
+    TextView mTxtCurrentScore;
+
+    @InjectView(R.id.txt_score_best)
+    TextView mTxtBestScore;
+
     private OnPlayingFieldEventListener mPlayingFieldEventListener;
     private GestureDetector mGestureDetector;
     private View.OnTouchListener mGestureListener;
@@ -68,6 +75,9 @@ public class PlayingFieldFragment extends Fragment {
 
     public PlayingFieldFragment() {
         // Required empty public constructor
+        super();
+        mLastHighScore = 0;
+        mCurrentScore = 0;
     }
 
     @Override
@@ -85,6 +95,9 @@ public class PlayingFieldFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playing_field, container, false);
         ButterKnife.inject(this, view);
+
+        mTxtBestScore.setText(String.valueOf(mLastHighScore));
+        mTxtCurrentScore.setText(String.valueOf(mCurrentScore));
 
         // Gesture detection
         mGestureDetector = new GestureDetector(container.getContext(), new MyGestureDetector());
@@ -282,9 +295,13 @@ public class PlayingFieldFragment extends Fragment {
 
         private void handleMoveDone(Intent intent) {
             try {
-                int[][] updatedGrid = (int[][]) intent.getSerializableExtra(MCP.KEY_MOVEMENTS);
 
-                mSquareGridView.updateGrid(updatedGrid);
+                MovementChanges changes = intent.getParcelableExtra(MCP.KEY_MOVEMENT_CHANGES);
+
+                mSquareGridView.updateGrid(changes.gridStatus);
+                //TODO animate new points
+                mCurrentScore += changes.pointsEarned;
+                mTxtCurrentScore.setText(String.valueOf(mCurrentScore));
 
             } catch (Exception e) {
                 Log.e(TAG, "Could not read movements from broadcast.", e);
