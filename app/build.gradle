@@ -69,31 +69,33 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-if (secretProps.hasProperty("DEPLOYGATE_USERNAME") && secretProps.hasProperty("DEPLOYGATE_TOKEN")) {
+
+if (secretProps.containsKey("DEPLOYGATE_USERNAME") && secretProps.containsKey("DEPLOYGATE_TOKEN")) {
 
     apply plugin: 'deploygate'
+    gradle.taskGraph.whenReady { graph ->
 
-    deploygate {
-        userName = secretProps.getProperty("DEPLOYGATE_USERNAME")
-        token = secretProps.getProperty("DEPLOYGATE_TOKEN")
+        project.configure(deploygate, {
+            userName = secretProps.getProperty("DEPLOYGATE_USERNAME")
+            token = secretProps.getProperty("DEPLOYGATE_TOKEN")
 
-        apks {
-            beta {
-                sourceFile = file("build/apk/app-beta-unaligned.apk")
+            apks {
+                beta {
+                    sourceFile = file("build/apk/app-beta-unaligned.apk")
 
-                def betaComment = secretProps.getProperty("DEPLOYGATE_RELEASE_NOTES")
-                if (betaComment != null && betaComment.length() > 0) {
-                    releaseNote = betaComment
-                    message = betaComment
-                }
+                    def betaComment = secretProps.getProperty("DEPLOYGATE_RELEASE_NOTES")
+                    if (betaComment != null && betaComment.length() > 0) {
+                        releaseNote = betaComment
+                        message = betaComment
+                    }
 
-                if (secretProps.hasProperty("DEPLOYGATE_DISTRIBUTION_ID")) {
-                    distributionKey = secretProps.getProperty("DEPLOYGATE_DISTRIBUTION_ID")
+                    if (secretProps.hasProperty("DEPLOYGATE_DISTRIBUTION_ID")) {
+                        distributionKey = secretProps.getProperty("DEPLOYGATE_DISTRIBUTION_ID")
+                    }
                 }
             }
-        }
+        })
     }
-
 }
 
 def getReleaseNotes(flavor) {
