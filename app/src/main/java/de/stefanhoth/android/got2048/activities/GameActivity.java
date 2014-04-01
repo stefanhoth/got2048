@@ -9,8 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.crashlytics.android.Crashlytics;
-
 import de.stefanhoth.android.got2048.GameEngineService;
 import de.stefanhoth.android.got2048.Got2048App;
 import de.stefanhoth.android.got2048.R;
@@ -36,7 +34,6 @@ public class GameActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
 
         setContentView(R.layout.activity_game);
 

@@ -1,12 +1,9 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url 'http://download.crashlytics.com/maven' }
     }
-
     dependencies {
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.9.+'
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
         classpath 'com.deploygate:gradle:0.6'
     }
 }
@@ -64,52 +61,12 @@ android {
     }
 }
 
-
-repositories {
-    maven { url 'http://download.crashlytics.com/maven' }
-}
 dependencies {
     compile 'com.android.support:support-v4:+'
     compile 'junit:junit:3.+'
     compile 'com.jakewharton:butterknife:4.+'
+    compile 'com.deploygate:sdk:3.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.crashlytics.android:crashlytics:1.+'
-
-}
-
-// Override Data in Manifest
-android.applicationVariants.each { variant ->
-    variant.processManifest.doLast {
-        copy {
-            // *** SET COPY PATHS ***
-            try {
-                from("${buildDir}/manifests") {
-                    //println "from: ${buildDir}/manifests"
-                    include "${variant.dirName}/AndroidManifest.xml"
-                    //println "included: ${variant.dirName}/AndroidManifest.xml"
-                }
-            } catch (e) {
-                println "error: " + e
-            }
-
-            into("${buildDir}/manifests/${variant.name}")
-
-            filter {
-                String line ->
-                    line.replaceAll("CRASHLYTICS_API_KEY", secretProps.getProperty("CRASHLYTICS_API_KEY"));
-            }
-        }
-    }
-
-    // *** SET PATH TO NEW MANIFEST ***
-    variant.processResources.manifestFile = file("${buildDir}/manifests/${variant.name}/${variant.dirName}/AndroidManifest.xml")
-
-    variant.processManifest.doLast {
-
-        // STUPID  plugin checks for  API key and can't handle proper resource resolution
-        // so we have to replace the key on the fly before activating it
-        apply plugin: 'crashlytics'
-    }
 }
 
 if (secretProps.hasProperty("DEPLOYGATE_USERNAME") && secretProps.hasProperty("DEPLOYGATE_TOKEN")) {
