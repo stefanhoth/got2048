@@ -29,24 +29,15 @@ public class MCP {
 
     public static final String BROADCAST_ACTION_MOVE_START = MCP.class.getPackage() + ".action.MOVE_START";
     public static final String BROADCAST_ACTION_MOVE_DONE = MCP.class.getPackage() + ".action.MOVE_DONE";
-    public static final String BROADCAST_ACTION_ADD_POINTS = MCP.class.getPackage() + ".action.ADD_POINTS";
     public static final String BROADCAST_ACTION_GAME_WON = MCP.class.getPackage() + ".action.GAME_WON";
     public static final String BROADCAST_ACTION_GAME_OVER = MCP.class.getPackage() + ".action.GAME_OVER";
     public static final String KEY_DIRECTION = MCP.class.getPackage() + ".key.DIRECTION";
     public static final String KEY_MOVEMENT_CHANGES = MCP.class.getPackage() + ".key.MOVEMENTS";
-    public static final String KEY_POINTS_ADDED = MCP.class.getPackage() + ".key.POINTS_ADDED";
     private final Context mContext;
 
     private Grid playlingField;
     private boolean mGameStopped;
     private boolean mCurrentlyMoving;
-
-    public MCP(Context context) {
-        mContext = context;
-        playlingField = new Grid();
-        mGameStopped = false;
-        mCurrentlyMoving = false;
-    }
 
     public MCP(Context context, int gridSize) {
         mContext = context;
@@ -152,14 +143,6 @@ public class MCP {
         extras.putParcelable(KEY_MOVEMENT_CHANGES, changes);
 
         sendLocalBroadcast(BROADCAST_ACTION_MOVE_DONE, extras);
-    }
-
-    private void updatePointsAddedListeners(int pointsAdded) {
-
-        Bundle extras = new Bundle();
-        extras.putInt(KEY_POINTS_ADDED, pointsAdded);
-
-        sendLocalBroadcast(BROADCAST_ACTION_ADD_POINTS, extras);
     }
 
     private void updateGameOverListeners() {
