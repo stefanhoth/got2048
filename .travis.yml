@@ -3,6 +3,12 @@ jdk: oraclejdk7
 env:
   matrix:
     - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+
+cache: apt
+branches:
+  only:
+    - master
+
 before_install:
   # Install base Android SDK
   - sudo apt-get update -qq
