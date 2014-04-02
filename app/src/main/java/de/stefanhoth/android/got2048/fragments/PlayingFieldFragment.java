@@ -20,6 +20,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.deploygate.sdk.DeployGate;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.stefanhoth.android.got2048.R;
@@ -320,6 +322,32 @@ public class PlayingFieldFragment extends Fragment {
 
     }
 
+
+    private void checkHighscore() {
+
+        if (mCurrentScore > mHighscore) {
+            //TODO do something visually fancy
+            Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
+            mHighscore = mCurrentScore;
+
+            String username = DeployGate.getLoginUsername();
+            String message = String.format("%s just reached a new highscore: %d", (username == null) ? "UNKNOWN" : username, mHighscore);
+            DeployGate.logInfo(message);
+
+            if (!SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore)) {
+                Log.e(TAG, "checkHighscore: Could not persist highscore into shared prefs.");
+                return;
+            }
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTvHighscore.setText(String.valueOf(mCurrentScore));
+                }
+            });
+        }
+    }
+
     // Broadcast receiver for receiving status updates from the IntentService
     private class McpEventReceiver extends BroadcastReceiver {
 
@@ -390,22 +418,6 @@ public class PlayingFieldFragment extends Fragment {
             checkHighscore();
 
             mGameStatus.setText("YOU WON!");
-        }
-    }
-
-    private void checkHighscore() {
-
-        if (mCurrentScore > mHighscore) {
-            //TODO do something visually fancy
-            Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
-            SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore);
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTvHighscore.setText(String.valueOf(mCurrentScore));
-                }
-            });
         }
     }
 }
