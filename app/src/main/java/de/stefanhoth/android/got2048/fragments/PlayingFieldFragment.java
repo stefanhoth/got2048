@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -51,6 +53,7 @@ public class PlayingFieldFragment extends Fragment {
 
     private static final String KEY_HIGHSCORE = "KEY_HIGHSCORE";
     private static final String TAG = PlayingFieldFragment.class.getName();
+    private static final String PREF_USER_LEARNED_SWIPE = "PREF_USER_LEARNED_SWIPE";
 
     private int mCurrentScore;
     private int mHighscore;
@@ -72,6 +75,7 @@ public class PlayingFieldFragment extends Fragment {
     private View.OnTouchListener mGestureListener;
     private McpEventReceiver mMcpEventReceiver;
     private boolean mReadyAnnounced;
+    private boolean mUserLearnedSwipe;
 
     /**
      * Use this factory method to create a new instance of
@@ -104,6 +108,11 @@ public class PlayingFieldFragment extends Fragment {
         if (getArguments() != null) {
             mHighscore = getArguments().getInt(KEY_HIGHSCORE);
         }
+
+        // Read in the flag indicating whether or not the user has demonstrated awareness of the
+        // drawer. See PREF_USER_LEARNED_SWIPE for details.
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mUserLearnedSwipe = sp.getBoolean(PREF_USER_LEARNED_SWIPE, false);
     }
 
     @Override
@@ -240,7 +249,6 @@ public class PlayingFieldFragment extends Fragment {
 //            return false;
 //        }
 
-            String direction = "";
             if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                 //move up
                 announceMovement(MOVE_DIRECTION.UP);
@@ -254,6 +262,11 @@ public class PlayingFieldFragment extends Fragment {
                 //move right
                 announceMovement(MOVE_DIRECTION.RIGHT);
             }
+
+            mUserLearnedSwipe = true;
+            SharedPreferences sp = PreferenceManager
+                    .getDefaultSharedPreferences(getActivity());
+            sp.edit().putBoolean(PREF_USER_LEARNED_SWIPE, mUserLearnedSwipe).apply();
 
             return true;
         }
@@ -316,6 +329,16 @@ public class PlayingFieldFragment extends Fragment {
             mPlayingFieldEventListener.onPlayingFieldReady();
         }
 
+        mReadyAnnounced = true;
+
+        teachSwipeMovement();
+    }
+
+    private void teachSwipeMovement() {
+        if (mUserLearnedSwipe) {
+            return;
+        }
+
         float translateBy = 50f;
         int startDelay = 1000;
         int duration = 300;
@@ -334,8 +357,6 @@ public class PlayingFieldFragment extends Fragment {
         bouncer.setDuration(duration);
         bouncer.setInterpolator(new AccelerateDecelerateInterpolator());
         bouncer.start();
-
-        mReadyAnnounced = true;
     }
 
     private void announceMovement(MOVE_DIRECTION direction) {
