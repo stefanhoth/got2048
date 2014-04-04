@@ -3,10 +3,10 @@
     tools:context="de.stefanhoth.android.got2048.activities.GameActivity" >
     <item android:id="@+id/action_random"
         android:title="@string/action_random"
-        android:icon="@drawable/ic_action_view_as_grid"
+        android:icon="@drawable/ic_action_playback_schuffle"
         android:showAsAction="withText|ifRoom" />
     <item android:id="@+id/action_refresh"
         android:title="@string/action_restart"
-        android:icon="@drawable/ic_action_refresh"
+        android:icon="@drawable/ic_action_redo"
         android:showAsAction="withText|ifRoom" />
 </menu>
