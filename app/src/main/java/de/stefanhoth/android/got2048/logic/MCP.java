@@ -140,6 +140,8 @@ public class MCP {
 
     public void restartGame() {
         playlingField.reset();
+        this.mGameStopped = false;
+
         addStartCells(true);
     }
 

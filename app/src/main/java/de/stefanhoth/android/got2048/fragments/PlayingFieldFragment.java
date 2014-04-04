@@ -273,7 +273,7 @@ public class PlayingFieldFragment extends Fragment {
         Log.d(TAG, "onOptionsItemSelected: id=" + id);
 
         if (id == R.id.action_restart) {
-            handleRestart();
+            handleRestartAction();
             return true;
         } else if (id == R.id.action_random) {
             Toast.makeText(getActivity().getBaseContext(), "Making a move…", Toast.LENGTH_SHORT).show();
@@ -284,7 +284,7 @@ public class PlayingFieldFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void handleRestart() {
+    private void handleRestartAction() {
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.action_restart)
@@ -456,6 +456,7 @@ public class PlayingFieldFragment extends Fragment {
 
                 if (changes.isRestart()) {
                     mCurrentScore = 0;
+                    mGameStatus.setText("");
                 } else {
                     mCurrentScore += changes.pointsEarned;
                 }
