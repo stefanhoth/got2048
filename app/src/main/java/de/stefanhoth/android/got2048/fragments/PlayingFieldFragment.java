@@ -3,9 +3,11 @@ package de.stefanhoth.android.got2048.fragments;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +27,7 @@ import com.deploygate.sdk.DeployGate;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.stefanhoth.android.got2048.GameEngineService;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.helpers.SettingsHelper;
 import de.stefanhoth.android.got2048.logic.MCP;
@@ -248,6 +252,38 @@ public class PlayingFieldFragment extends Fragment {
             return true;
         }
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_restart) {
+            handleRestart();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void handleRestart() {
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.action_restart)
+                .setMessage(R.string.dialog_restart_question)
+                .setPositiveButton(R.string.dialog_restart_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        GameEngineService.startActionRestartGame(getActivity().getBaseContext());
+                    }
+                })
+                .setNegativeButton(R.string.dialog_restart_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void announceReady() {
