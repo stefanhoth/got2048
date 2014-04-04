@@ -52,7 +52,7 @@ public class MCP {
         return playlingField;
     }
 
-    public void addStartCells() {
+    public void addStartCells(boolean isRestart) {
 
         MovementChanges changes = new MovementChanges(getPlaylingField().getGridStatus());
 
@@ -72,6 +72,8 @@ public class MCP {
             cell = nextCell;
             changes.addCell(cell, DEFAULT_START_VALUE);
         }
+
+        changes.setIsRestart(isRestart);
 
         updateMoveDoneListeners(changes);
     }
@@ -136,6 +138,13 @@ public class MCP {
         mCurrentlyMoving = false;
     }
 
+    public void restartGame() {
+        playlingField.reset();
+        this.mGameStopped = false;
+
+        addStartCells(true);
+    }
+
     private void updateMoveStartListeners(MOVE_DIRECTION direction) {
 
         Bundle extras = new Bundle();
@@ -187,4 +196,5 @@ public class MCP {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(localIntent);
 
     }
+
 }

@@ -21,6 +21,7 @@ public class MovementChanges implements Parcelable {
     public int[][] gridStatus;
     private List<Cell> addedCells;
     public int addedCellsValue;
+    private boolean isRestart;
 
     public MovementChanges(int[][] gridStatus) {
         cellsMoved = false;
@@ -38,6 +39,7 @@ public class MovementChanges implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte(cellsMoved ? (byte) 1 : (byte) 0);
+        dest.writeByte(isRestart ? (byte) 1 : (byte) 0);
         dest.writeInt(this.pointsEarned);
         dest.writeSerializable(this.gridStatus);
         dest.writeInt(this.addedCellsValue);
@@ -46,6 +48,7 @@ public class MovementChanges implements Parcelable {
 
     private MovementChanges(Parcel in) {
         this.cellsMoved = in.readByte() != 0;
+        this.isRestart = in.readByte() != 0;
         this.pointsEarned = in.readInt();
         this.gridStatus = (int[][]) in.readSerializable();
         this.addedCellsValue = in.readInt();
@@ -70,5 +73,13 @@ public class MovementChanges implements Parcelable {
 
     public List<Cell> getAddedCells() {
         return addedCells;
+    }
+
+    public void setIsRestart(boolean isRestart) {
+        this.isRestart = isRestart;
+    }
+
+    public boolean isRestart() {
+        return isRestart;
     }
 }

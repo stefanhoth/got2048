@@ -5,3 +5,4 @@
 .DS_Store
 
 secret.properties
+/deployment

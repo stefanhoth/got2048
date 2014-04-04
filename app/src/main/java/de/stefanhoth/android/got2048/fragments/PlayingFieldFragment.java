@@ -3,16 +3,23 @@ package de.stefanhoth.android.got2048.fragments;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +27,13 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.deploygate.sdk.DeployGate;
+
+import java.util.Random;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.stefanhoth.android.got2048.GameEngineService;
 import de.stefanhoth.android.got2048.R;
 import de.stefanhoth.android.got2048.helpers.SettingsHelper;
 import de.stefanhoth.android.got2048.logic.MCP;
@@ -41,6 +53,7 @@ public class PlayingFieldFragment extends Fragment {
 
     private static final String KEY_HIGHSCORE = "KEY_HIGHSCORE";
     private static final String TAG = PlayingFieldFragment.class.getName();
+    private static final String PREF_USER_LEARNED_SWIPE = "PREF_USER_LEARNED_SWIPE";
 
     private int mCurrentScore;
     private int mHighscore;
@@ -62,6 +75,7 @@ public class PlayingFieldFragment extends Fragment {
     private View.OnTouchListener mGestureListener;
     private McpEventReceiver mMcpEventReceiver;
     private boolean mReadyAnnounced;
+    private boolean mUserLearnedSwipe;
 
     /**
      * Use this factory method to create a new instance of
@@ -94,6 +108,11 @@ public class PlayingFieldFragment extends Fragment {
         if (getArguments() != null) {
             mHighscore = getArguments().getInt(KEY_HIGHSCORE);
         }
+
+        // Read in the flag indicating whether or not the user has demonstrated awareness of the
+        // drawer. See PREF_USER_LEARNED_SWIPE for details.
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mUserLearnedSwipe = sp.getBoolean(PREF_USER_LEARNED_SWIPE, false);
     }
 
     @Override
@@ -132,6 +151,8 @@ public class PlayingFieldFragment extends Fragment {
         };
 
         mSquareGridView.setOnTouchListener(mGestureListener);
+
+        setHasOptionsMenu(true);
 
         return view;
     }
@@ -228,7 +249,6 @@ public class PlayingFieldFragment extends Fragment {
 //            return false;
 //        }
 
-            String direction = "";
             if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                 //move up
                 announceMovement(MOVE_DIRECTION.UP);
@@ -243,9 +263,60 @@ public class PlayingFieldFragment extends Fragment {
                 announceMovement(MOVE_DIRECTION.RIGHT);
             }
 
+            mUserLearnedSwipe = true;
+            SharedPreferences sp = PreferenceManager
+                    .getDefaultSharedPreferences(getActivity());
+            sp.edit().putBoolean(PREF_USER_LEARNED_SWIPE, mUserLearnedSwipe).apply();
+
             return true;
         }
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.game, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Log.d(TAG, "onOptionsItemSelected: id=" + id);
+
+        if (id == R.id.action_restart) {
+            handleRestartAction();
+            return true;
+        } else if (id == R.id.action_random) {
+            Toast.makeText(getActivity().getBaseContext(), "Making a move…", Toast.LENGTH_SHORT).show();
+            announceMovement(MOVE_DIRECTION.values()[new Random().nextInt(MOVE_DIRECTION.values().length)]);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void handleRestartAction() {
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.action_restart)
+                .setMessage(R.string.dialog_restart_question)
+                .setPositiveButton(R.string.dialog_restart_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        GameEngineService.startActionRestartGame(getActivity().getBaseContext());
+                    }
+                })
+                .setNegativeButton(R.string.dialog_restart_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void announceReady() {
@@ -256,6 +327,16 @@ public class PlayingFieldFragment extends Fragment {
 
         if (mPlayingFieldEventListener != null) {
             mPlayingFieldEventListener.onPlayingFieldReady();
+        }
+
+        mReadyAnnounced = true;
+
+        teachSwipeMovement();
+    }
+
+    private void teachSwipeMovement() {
+        if (mUserLearnedSwipe) {
+            return;
         }
 
         float translateBy = 50f;
@@ -276,8 +357,6 @@ public class PlayingFieldFragment extends Fragment {
         bouncer.setDuration(duration);
         bouncer.setInterpolator(new AccelerateDecelerateInterpolator());
         bouncer.start();
-
-        mReadyAnnounced = true;
     }
 
     private void announceMovement(MOVE_DIRECTION direction) {
@@ -318,6 +397,32 @@ public class PlayingFieldFragment extends Fragment {
         bouncer.setInterpolator(new AccelerateDecelerateInterpolator());
         bouncer.start();
 
+    }
+
+
+    private void checkHighscore() {
+
+        if (mCurrentScore > mHighscore) {
+            //TODO do something visually fancy
+            Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
+            mHighscore = mCurrentScore;
+
+            String username = DeployGate.getLoginUsername();
+            String message = String.format("%s just reached a new highscore: %d", (username == null) ? "UNKNOWN" : username, mHighscore);
+            DeployGate.logInfo(message);
+
+            if (!SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore)) {
+                Log.e(TAG, "checkHighscore: Could not persist highscore into shared prefs.");
+                return;
+            }
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTvHighscore.setText(String.valueOf(mCurrentScore));
+                }
+            });
+        }
     }
 
     // Broadcast receiver for receiving status updates from the IntentService
@@ -369,8 +474,14 @@ public class PlayingFieldFragment extends Fragment {
 
                 mSquareGridView.updateGrid(changes.gridStatus);
                 mSquareGridView.addCells(changes.getAddedCells(), changes.addedCellsValue);
+
+                if (changes.isRestart()) {
+                    mCurrentScore = 0;
+                    mGameStatus.setText("");
+                } else {
+                    mCurrentScore += changes.pointsEarned;
+                }
                 //TODO animate new points
-                mCurrentScore += changes.pointsEarned;
                 mTvCurrentScore.setText(String.valueOf(mCurrentScore));
 
             } catch (Exception e) {
@@ -390,22 +501,6 @@ public class PlayingFieldFragment extends Fragment {
             checkHighscore();
 
             mGameStatus.setText("YOU WON!");
-        }
-    }
-
-    private void checkHighscore() {
-
-        if (mCurrentScore > mHighscore) {
-            //TODO do something visually fancy
-            Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
-            SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore);
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTvHighscore.setText(String.valueOf(mCurrentScore));
-                }
-            });
         }
     }
 }
