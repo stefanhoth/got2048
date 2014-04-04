@@ -15,6 +15,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.deploygate.sdk.DeployGate;
+
+import java.util.Random;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -138,6 +142,8 @@ public class PlayingFieldFragment extends Fragment {
         };
 
         mSquareGridView.setOnTouchListener(mGestureListener);
+
+        setHasOptionsMenu(true);
 
         return view;
     }
@@ -255,12 +261,26 @@ public class PlayingFieldFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.game, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Log.d(TAG, "onOptionsItemSelected: id=" + id);
+
         if (id == R.id.action_restart) {
             handleRestart();
             return true;
+        } else if (id == R.id.action_random) {
+            Toast.makeText(getActivity().getBaseContext(), "Making a move…", Toast.LENGTH_SHORT).show();
+            announceMovement(MOVE_DIRECTION.values()[new Random().nextInt(MOVE_DIRECTION.values().length)]);
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
