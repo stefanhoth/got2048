@@ -18,12 +18,19 @@ public class GameEngineService extends IntentService {
 
     private static final String ACTION_MOVE = GameEngineService.class.getPackage() + ".action.MOVE";
     private static final String ACTION_START_GAME = GameEngineService.class.getPackage() + ".action.START_GAME";
+    private static final String ACTION_RESTART_GAME = GameEngineService.class.getPackage() + ".action.RESTART_GAME";
 
     private static final String EXTRA_DIRECTION = GameEngineService.class.getPackage() + ".extra.PARAM1";
 
     public static void startActionStartGame(Context context) {
         Intent intent = new Intent(context, GameEngineService.class);
         intent.setAction(ACTION_START_GAME);
+        context.startService(intent);
+    }
+
+    public static void startActionRestartGame(Context context) {
+        Intent intent = new Intent(context, GameEngineService.class);
+        intent.setAction(ACTION_RESTART_GAME);
         context.startService(intent);
     }
 
@@ -50,6 +57,8 @@ public class GameEngineService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_START_GAME.equals(action)) {
                 handleActionStartGame();
+            } else if (ACTION_RESTART_GAME.equals(action)) {
+                handleActionRestartGame();
             } else if (ACTION_MOVE.equals(action)) {
                 try {
                     final MOVE_DIRECTION direction = MOVE_DIRECTION.values()[intent.getIntExtra(EXTRA_DIRECTION, 0)];
@@ -72,7 +81,17 @@ public class GameEngineService extends IntentService {
             return;
         }
 
-        ((Got2048App) getApplication()).getMCP().addStartCells();
+        ((Got2048App) getApplication()).getMCP().addStartCells(false);
+    }
+
+    private void handleActionRestartGame() {
+
+        if (getApplication() == null || !(getApplication() instanceof Got2048App)) {
+            Log.e(TAG, "handleActionMove: Could not access application object");
+            return;
+        }
+
+        ((Got2048App) getApplication()).getMCP().restartGame();
     }
 
     /**
@@ -91,5 +110,4 @@ public class GameEngineService extends IntentService {
 
         ((Got2048App) getApplication()).getMCP().move(direction);
     }
-
 }

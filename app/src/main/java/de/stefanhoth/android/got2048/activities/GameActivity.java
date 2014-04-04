@@ -2,7 +2,9 @@ package de.stefanhoth.android.got2048.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -105,10 +107,33 @@ public class GameActivity extends Activity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_restart) {
+            handleRestart();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void handleRestart() {
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.action_restart)
+                .setMessage(R.string.dialog_restart_question)
+                .setPositiveButton(R.string.dialog_restart_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        GameEngineService.startActionRestartGame(getBaseContext());
+                    }
+                })
+                .setNegativeButton(R.string.dialog_restart_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
     }
 
     @Override

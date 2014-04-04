@@ -397,8 +397,13 @@ public class PlayingFieldFragment extends Fragment {
 
                 mSquareGridView.updateGrid(changes.gridStatus);
                 mSquareGridView.addCells(changes.getAddedCells(), changes.addedCellsValue);
+
+                if (changes.isRestart()) {
+                    mCurrentScore = 0;
+                } else {
+                    mCurrentScore += changes.pointsEarned;
+                }
                 //TODO animate new points
-                mCurrentScore += changes.pointsEarned;
                 mTvCurrentScore.setText(String.valueOf(mCurrentScore));
 
             } catch (Exception e) {

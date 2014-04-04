@@ -46,7 +46,7 @@ public class MCPTest extends TestCase {
 
     public void testStartCellsAdded() throws Exception {
 
-        mcp.addStartCells();
+        mcp.addStartCells(false);
 
         assertEquals("Active cells", MCP.DEFAULT_START_FIELDS, mcp.getPlaylingField().getActiveCells());
     }

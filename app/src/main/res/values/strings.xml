@@ -13,5 +13,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="label_score_current">Current Score</string>
     <string name="label_score_best">Best Score</string>
+    <string name="dialog_restart_question">Are you sure you want to restart the game? You current progress will be lost. \n\nBut maybe that\'s for the better anyway…</string>
+    <string name="dialog_restart_yes">Yes, restart now</string>
+    <string name="dialog_restart_no">No, keep my game</string>
 
 </resources>
