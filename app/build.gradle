@@ -1,6 +1,9 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.9.+'
@@ -24,7 +27,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 15
@@ -52,6 +55,7 @@ android {
         beta {
             versionNameSuffix "-BETA"
             packageNameSuffix ".beta"
+            debuggable false
         }
 
         release {
