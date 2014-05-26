@@ -5,24 +5,12 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +40,8 @@ import de.stefanhoth.android.got2048.widgets.SquareGridView;
 public class PlayingFieldFragment extends Fragment {
 
     private static final String KEY_HIGHSCORE = "KEY_HIGHSCORE";
+    private static final String KEY_CURRENT_SCORE = "KEY_CURRENT_SCORE";
+    private static final String KEY_READY_ANNOUNCED = "KEY_READY_ANNOUNCED";
     private static final String TAG = PlayingFieldFragment.class.getName();
     private static final String PREF_USER_LEARNED_SWIPE = "PREF_USER_LEARNED_SWIPE";
 
@@ -121,15 +111,17 @@ public class PlayingFieldFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_playing_field, container, false);
         ButterKnife.inject(this, view);
 
-        if (mHighscore > 0) {
-            mTvHighscore.setText(String.valueOf(mHighscore));
-        } else {
-            mTvHighscore.setText("-");
-        }
-        mTvCurrentScore.setText(String.valueOf(mCurrentScore));
+        setHasOptionsMenu(true);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         // Gesture detection
-        mGestureDetector = new GestureDetector(container.getContext(), new MyGestureDetector());
+        mGestureDetector = new GestureDetector(view.getContext(), new MyGestureDetector());
         mGestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -152,9 +144,20 @@ public class PlayingFieldFragment extends Fragment {
 
         mSquareGridView.setOnTouchListener(mGestureListener);
 
-        setHasOptionsMenu(true);
+        if (savedInstanceState != null) {
+            mCurrentScore = savedInstanceState.getInt(KEY_CURRENT_SCORE);
+            mHighscore = savedInstanceState.getInt(KEY_HIGHSCORE);
+            mReadyAnnounced = savedInstanceState.getBoolean(KEY_READY_ANNOUNCED);
+        }
 
-        return view;
+        if (mHighscore > 0) {
+            mTvHighscore.setText(String.valueOf(mHighscore));
+        } else {
+            mTvHighscore.setText("-");
+        }
+        mTvCurrentScore.setText(String.valueOf(mCurrentScore));
+
+        announceReady();
     }
 
     @Override
@@ -185,18 +188,29 @@ public class PlayingFieldFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        announceReady();
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
 
         if (mMcpEventReceiver != null && getActivity() != null && getActivity().getBaseContext() != null) {
             LocalBroadcastManager.getInstance(getActivity().getBaseContext()).unregisterReceiver(mMcpEventReceiver);
             mMcpEventReceiver = null;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_CURRENT_SCORE, mCurrentScore);
+        outState.putInt(KEY_HIGHSCORE, mHighscore);
+        outState.putBoolean(KEY_READY_ANNOUNCED, mReadyAnnounced);
+    }
+
+    public void setHighscore(int highscore) {
+
+        if (highscore > 0) {
+            mHighscore = highscore;
+            mTvHighscore.setText(String.valueOf(mHighscore));
         }
     }
 

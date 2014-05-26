@@ -2,7 +2,6 @@ package de.stefanhoth.android.got2048.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -49,10 +48,7 @@ public class GameActivity extends Activity
 
         int highscore = SettingsHelper.loadHighscore(getBaseContext());
 
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlayingFieldFragment.newInstance(highscore))
-                .commit();
+        ((PlayingFieldFragment) getFragmentManager().findFragmentById(R.id.fragment_playing_field)).setHighscore(highscore);
     }
 
     @Override
