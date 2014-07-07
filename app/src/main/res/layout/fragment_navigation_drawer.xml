@@ -6,4 +6,4 @@
     android:divider="@android:color/transparent"
     android:dividerHeight="0dp"
     android:background="#cccc"
-    tools:context="de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment" />
+    tools:context="de.stefanhoth.android.de.stefanhoth.android.got2048.fragments.NavigationDrawerFragment" />

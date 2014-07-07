@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/score_header_height"
+        android:layout_height="0dip"
         android:background="@color/score_header_background"
         android:orientation="horizontal"
         android:padding="@dimen/score_header_padding">
@@ -57,6 +57,8 @@
         android:id="@+id/playing_field"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_gravity="center_horizontal"
         android:background="@color/game_background"
         android:stretchMode="columnWidth"
