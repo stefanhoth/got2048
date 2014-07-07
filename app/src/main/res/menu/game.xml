@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="de.stefanhoth.android.de.stefanhoth.android.got2048.activities.GameActivity">
+    tools:context="de.stefanhoth.android.got2048.activities.GameActivity">
     <item
         android:id="@+id/action_random"
         android:title="@string/action_random"
