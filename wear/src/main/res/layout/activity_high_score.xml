@@ -6,8 +6,8 @@
     android:id="@+id/watch_view_stub"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:rectLayout="@layout/rect_activity_game"
-    app:roundLayout="@layout/round_activity_game"
-    tools:context="de.stefanhoth.android.got2048.activities.GameActivity"
+    app:rectLayout="@layout/rect_activity_high_score"
+    app:roundLayout="@layout/round_activity_high_score"
+    tools:context="de.stefanhoth.android.got2048.activities.HighScoreActivity"
     tools:deviceIds="wear">
 </android.support.wearable.view.WatchViewStub>

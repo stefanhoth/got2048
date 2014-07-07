@@ -212,8 +212,8 @@ public class PlayingFieldFragment extends Fragment {
      */
     public interface OnPlayingFieldEventListener {
         public void onMovementRecognized(MOVE_DIRECTION direction);
-
         public void onPlayingFieldReady();
+        public void onGameOver(int score, int bestScore, boolean won);
     }
 
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
@@ -414,21 +414,10 @@ public class PlayingFieldFragment extends Fragment {
             Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
             mHighscore = mCurrentScore;
 
-            String username = DeployGate.getLoginUsername();
-            String message = String.format("%s just reached a new highscore: %d", (username == null) ? "UNKNOWN" : username, mHighscore);
-            DeployGate.logInfo(message);
-
             if (!SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore)) {
                 Log.e(TAG, "checkHighscore: Could not persist highscore into shared prefs.");
                 return;
             }
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTvHighscore.setText(String.valueOf(mCurrentScore));
-                }
-            });
         }
     }
 
@@ -500,14 +489,16 @@ public class PlayingFieldFragment extends Fragment {
 
             checkHighscore();
 
-            mGameStatus.setText("GAME OVER");
+            if(mPlayingFieldEventListener != null)
+                mPlayingFieldEventListener.onGameOver(mCurrentScore, mHighscore, false);
         }
 
         private void handleGameWon(Intent intent) {
 
             checkHighscore();
 
-            mGameStatus.setText("YOU WON!");
+            if(mPlayingFieldEventListener != null)
+                mPlayingFieldEventListener.onGameOver(mCurrentScore, mHighscore, true);
         }
     }
 }

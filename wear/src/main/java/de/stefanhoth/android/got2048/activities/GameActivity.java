@@ -2,6 +2,7 @@ package de.stefanhoth.android.got2048.activities;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
@@ -20,11 +21,6 @@ public class GameActivity extends Activity
 
     private static final String TAG = GameActivity.class.getName();
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +31,6 @@ public class GameActivity extends Activity
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub watchViewStub) {
-                mTitle = getTitle();
 
                 int highscore = SettingsHelper.loadHighscore(getBaseContext());
 
@@ -45,17 +40,6 @@ public class GameActivity extends Activity
                         .commit();
             }
         });
-    }
-
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-        }
     }
 
     @Override
@@ -85,6 +69,17 @@ public class GameActivity extends Activity
 
         Log.d(TAG, "onPlayingFieldReady: View is ready for gaming. Starting game.");
         GameEngineService.startActionStartGame(getBaseContext());
+        GameEngineService.startActionRestartGame(getBaseContext());
+    }
+
+    @Override
+    public void onGameOver(int score, int bestScore, boolean won) {
+        Intent gameOverIntent = new Intent(GameActivity.this, GameOverActivity.class);
+        gameOverIntent.putExtra(GameOverActivity.SCORE_EXTRA, score);
+        gameOverIntent.putExtra(GameOverActivity.BEST_SCORE_EXTRA, bestScore);
+        gameOverIntent.putExtra(GameOverActivity.DID_WIN_EXTRA, won);
+        startActivity(gameOverIntent);
+        finish();
 
     }
 

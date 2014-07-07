@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="button_text">#ffffff</color>
-    <color name="button_normal">#ffffb336</color>
-    <color name="button_pressed">#fff4892c</color>
+    <color name="button_normal">#33B5E5</color>
+    <color name="button_pressed">#0099CC</color>
     <color name="score_header_background">#CCDEDEDE</color>
     <color name="game_background">#CCCCCC</color>
     <color name="cell_background_default">#ebe4da</color>
@@ -17,4 +17,6 @@
     <color name="cell_background_step_9">#88FF4444</color>
     <color name="cell_background_step_10">#88CC0000</color>
     <color name="cell_background_step_11">#88fff500</color>
+    <color name="won">#ff4bc15d</color>
+    <color name="lost">#ffc14633</color>
 </resources>

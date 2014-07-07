@@ -10,4 +10,8 @@
     <dimen name="score_header_height">60dp</dimen>
     
     <dimen name="cell_font_size">30sp</dimen>
+
+    <dimen name="page_row_margin">100dp</dimen>
+    <dimen name="page_column_margin">10dp</dimen>
+    <dimen name="page_column_margin_round">50dp</dimen>
 </resources>

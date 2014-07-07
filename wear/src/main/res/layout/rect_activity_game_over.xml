@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.stefanhoth.android.got2048.activities.GameOverActivity"
+    android:id="@+id/game_over_container"
+    tools:deviceIds="wear_square" android:background="@color/lost">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="20dip"
+        android:textAppearance="?android:attr/textAppearanceLarge">
+        <ImageView
+            android:id="@+id/game_over_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_gameover"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/button_text"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/title_game_over"
+            android:id="@+id/game_over_title" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/button_text"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Your Score: 32456"
+            android:id="@+id/game_over_current_score" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/button_text"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Best Score: 32456"
+            android:id="@+id/game_over_best_score" />
+    </LinearLayout>
+</RelativeLayout>

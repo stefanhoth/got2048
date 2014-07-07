@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="de.stefanhoth.android.got2048">
+    package="de.stefanhoth.android.got2048"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk tools:node="replace" />
+
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
-        android:name="de.stefanhoth.android.got2048.Got2048App"
+        android:name=".Got2048App"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
-            android:name="de.stefanhoth.android.got2048.activities.GameActivity"
-            android:label="@string/app_name">
+            android:name=".activities.MenuActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.GameActivity" >
+        </activity>
 
         <service
-            android:name="de.stefanhoth.android.got2048.GameEngineService"
+            android:name=".GameEngineService"
             android:exported="false" />
+
+        <activity
+            android:name=".activities.GameOverActivity"
+            android:label="@string/title_activity_game_over" >
+        </activity>
+        <activity
+            android:name=".activities.AboutActivity"
+            android:label="@string/title_activity_about" >
+        </activity>
+        <activity
+            android:name=".activities.HighScoreActivity"
+            android:label="@string/title_activity_hight_score" >
+        </activity>
     </application>
 
 </manifest>
