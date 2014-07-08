@@ -42,7 +42,7 @@ android {
         beta.initWith(debug)
         beta {
             versionNameSuffix "-BETA"
-            packageNameSuffix ".beta"
+            applicationIdSuffix ".beta"
             debuggable false
         }
 
