@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Got 2048</string>
+    <string name="title_game">Game</string>
+    <string name="title_achievements">My Achievements</string>
+    <string name="title_about">About</string>
+    <string name="title_highscore">Highscore</string>
+    <string name="action_random">Random move</string>
+    <string name="action_restart">Restart game</string>
+    <string name="action_start">Start Game</string>
+    <string name="action_settings">Settings</string>
+    <string name="label_score">Your Score</string>
+    <string name="label_score_current">Current Score</string>
+    <string name="label_score_best">Best Score</string>
+    <string name="dialog_restart_question">Are you sure you want to restart the game? You current progress will be lost. \n\nBut maybe that\'s for the better anyway…</string>
+    <string name="dialog_restart_yes">Yes, restart now</string>
+    <string name="dialog_restart_no">No, keep my game</string>
+    <string name="title_game_over_won">You won!</string>
+    <string name="title_game_over">Game Over</string>
+    <string name="long_press_to_exit">Long press to exit game</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_game_over">GameOverActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="about_desc">Got 2048?\n\nA 2048 Clone for Android and Android Wear.\n\nCreated by Stefan Hoth\n(Android Wear Port by\nSebastian Mauer)</string>
+    <string name="title_activity_hight_score">HightScoreActivity</string>
+    <string name="hello_round">Hello Round World!</string>
+    <string name="hello_square">Hello Square World!</string>
+
+</resources>

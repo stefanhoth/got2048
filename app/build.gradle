@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.9.+'
-        classpath 'com.deploygate:gradle:0.6'
-    }
-}
 
 File secretPropsFile = file('../secret.properties');
 Properties secretProps = new Properties();
@@ -24,13 +15,13 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 19
-        versionCode 11
-        versionName "0.8"
+        versionCode 12
+        versionName "0.9"
     }
 
     compileOptions {
@@ -51,7 +42,8 @@ android {
         beta.initWith(debug)
         beta {
             versionNameSuffix "-BETA"
-            packageNameSuffix ".beta"
+            applicationIdSuffix ".beta"
+            debuggable false
         }
 
         release {
@@ -62,6 +54,7 @@ android {
 }
 
 dependencies {
+    wearApp project(':wear')
     compile 'com.android.support:support-v4:+'
     compile 'junit:junit:3.+'
     compile 'com.jakewharton:butterknife:4.+'

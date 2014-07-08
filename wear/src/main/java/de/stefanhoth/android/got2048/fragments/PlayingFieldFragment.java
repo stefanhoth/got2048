@@ -5,12 +5,24 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.*;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,8 +52,6 @@ import de.stefanhoth.android.got2048.widgets.SquareGridView;
 public class PlayingFieldFragment extends Fragment {
 
     private static final String KEY_HIGHSCORE = "KEY_HIGHSCORE";
-    private static final String KEY_CURRENT_SCORE = "KEY_CURRENT_SCORE";
-    private static final String KEY_READY_ANNOUNCED = "KEY_READY_ANNOUNCED";
     private static final String TAG = PlayingFieldFragment.class.getName();
     private static final String PREF_USER_LEARNED_SWIPE = "PREF_USER_LEARNED_SWIPE";
 
@@ -111,19 +121,20 @@ public class PlayingFieldFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_playing_field, container, false);
         ButterKnife.inject(this, view);
 
-        setHasOptionsMenu(true);
-
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        if (mHighscore > 0) {
+            mTvHighscore.setText(String.valueOf(mHighscore));
+        } else {
+            mTvHighscore.setText("-");
+        }
+        mTvCurrentScore.setText(String.valueOf(mCurrentScore));
 
         // Gesture detection
-        mGestureDetector = new GestureDetector(view.getContext(), new MyGestureDetector());
+        mGestureDetector = new GestureDetector(container.getContext(), new MyGestureDetector(getActivity()));
         mGestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
+
+                ViewGroup vg = (ViewGroup) v;
+                vg.requestDisallowInterceptTouchEvent(true);
 
                 if (mGestureDetector.onTouchEvent(event)) {
                     return true;
@@ -144,21 +155,11 @@ public class PlayingFieldFragment extends Fragment {
 
         mSquareGridView.setOnTouchListener(mGestureListener);
 
-        if (savedInstanceState != null) {
-            mCurrentScore = savedInstanceState.getInt(KEY_CURRENT_SCORE);
-            mHighscore = savedInstanceState.getInt(KEY_HIGHSCORE);
-            mReadyAnnounced = savedInstanceState.getBoolean(KEY_READY_ANNOUNCED);
-        }
+        setHasOptionsMenu(true);
 
-        if (mHighscore > 0) {
-            mTvHighscore.setText(String.valueOf(mHighscore));
-        } else {
-            mTvHighscore.setText("-");
-        }
-        mTvCurrentScore.setText(String.valueOf(mCurrentScore));
-
-        announceReady();
+        return view;
     }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -188,29 +189,18 @@ public class PlayingFieldFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        announceReady();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
 
         if (mMcpEventReceiver != null && getActivity() != null && getActivity().getBaseContext() != null) {
             LocalBroadcastManager.getInstance(getActivity().getBaseContext()).unregisterReceiver(mMcpEventReceiver);
             mMcpEventReceiver = null;
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-
-        super.onSaveInstanceState(outState);
-        outState.putInt(KEY_CURRENT_SCORE, mCurrentScore);
-        outState.putInt(KEY_HIGHSCORE, mHighscore);
-        outState.putBoolean(KEY_READY_ANNOUNCED, mReadyAnnounced);
-    }
-
-    public void setHighscore(int highscore) {
-
-        if (highscore > 0) {
-            mHighscore = highscore;
-            mTvHighscore.setText(String.valueOf(mHighscore));
         }
     }
 
@@ -222,8 +212,8 @@ public class PlayingFieldFragment extends Fragment {
      */
     public interface OnPlayingFieldEventListener {
         public void onMovementRecognized(MOVE_DIRECTION direction);
-
         public void onPlayingFieldReady();
+        public void onGameOver(int score, int bestScore, boolean won);
     }
 
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
@@ -231,6 +221,12 @@ public class PlayingFieldFragment extends Fragment {
         private static final int SWIPE_MIN_DISTANCE = 80;
         private static final int SWIPE_MAX_OFF_PATH = 100;
         private static final int SWIPE_THRESHOLD_VELOCITY = 150;
+
+        Activity mActivity;
+
+        public MyGestureDetector(Activity act) {
+            this.mActivity = act;
+        }
 
         @Override
         public boolean onDown(MotionEvent e) {
@@ -254,8 +250,9 @@ public class PlayingFieldFragment extends Fragment {
 
         @Override
         public void onLongPress(MotionEvent e) {
-
+            mActivity.finish();
         }
+
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -287,16 +284,10 @@ public class PlayingFieldFragment extends Fragment {
 
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.game, menu);
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        /*int id = item.getItemId();
         Log.d(TAG, "onOptionsItemSelected: id=" + id);
 
         if (id == R.id.action_restart) {
@@ -307,7 +298,7 @@ public class PlayingFieldFragment extends Fragment {
             announceMovement(MOVE_DIRECTION.values()[new Random().nextInt(MOVE_DIRECTION.values().length)]);
             return true;
         }
-
+        */
         return super.onOptionsItemSelected(item);
     }
 
@@ -346,6 +337,8 @@ public class PlayingFieldFragment extends Fragment {
         mReadyAnnounced = true;
 
         teachSwipeMovement();
+
+        Toast.makeText(getActivity(), R.string.long_press_to_exit, Toast.LENGTH_LONG).show();
     }
 
     private void teachSwipeMovement() {
@@ -421,21 +414,10 @@ public class PlayingFieldFragment extends Fragment {
             Toast.makeText(getActivity().getBaseContext(), "NEW HIGHSCORE!", Toast.LENGTH_SHORT).show();
             mHighscore = mCurrentScore;
 
-            String username = DeployGate.getLoginUsername();
-            String message = String.format("%s just reached a new highscore: %d", (username == null) ? "UNKNOWN" : username, mHighscore);
-            DeployGate.logInfo(message);
-
             if (!SettingsHelper.storeSettings(getActivity().getBaseContext(), mCurrentScore)) {
                 Log.e(TAG, "checkHighscore: Could not persist highscore into shared prefs.");
                 return;
             }
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTvHighscore.setText(String.valueOf(mCurrentScore));
-                }
-            });
         }
     }
 
@@ -507,14 +489,16 @@ public class PlayingFieldFragment extends Fragment {
 
             checkHighscore();
 
-            mGameStatus.setText("GAME OVER");
+            if(mPlayingFieldEventListener != null)
+                mPlayingFieldEventListener.onGameOver(mCurrentScore, mHighscore, false);
         }
 
         private void handleGameWon(Intent intent) {
 
             checkHighscore();
 
-            mGameStatus.setText("YOU WON!");
+            if(mPlayingFieldEventListener != null)
+                mPlayingFieldEventListener.onGameOver(mCurrentScore, mHighscore, true);
         }
     }
 }
