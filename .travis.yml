@@ -15,6 +15,7 @@ android:
 branches:
   only:
     - master
+    - develop
 
 before_script:
   # Create and start emulator
