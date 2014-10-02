@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.wearable.view.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <!-- As the main content view, the view below consumes the entire
              space available using match_parent in both dimensions. -->
     <FrameLayout
+        app:layout_box="all"
         android:keepScreenOn="true"
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-</LinearLayout>
+</android.support.wearable.view.BoxInsetLayout>

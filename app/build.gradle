@@ -10,7 +10,7 @@ if (secretPropsFile.exists()) {
 }
 
 apply plugin: 'android-sdk-manager'
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 19
